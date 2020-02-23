@@ -1,0 +1,14 @@
+{% extends "main.html" %}
+{% block content %}
+    {% if result %}
+        <article class="error">{{ result.message }}</article>
+    {% endif %}
+    <form action="url" method="POST">
+        <input name="url" type="url" placeholder="URL of soundfile"/>
+        <input type="submit" />
+    </form>
+    <form action="soundfile" method="POST">
+        <input name="soundfile" type="file" accept="audio/*" placeholder="Upload Soundfile"/>
+        <input type="submit" value="Upload" />
+    </form>
+{% endblock %}

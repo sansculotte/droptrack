@@ -1,0 +1,13 @@
+class Config(object):
+    APP_NAME = 'DropTrack'
+    DEBUG = True
+    DEVELOPMENT = True
+    SECRET_KEY = 'secret'
+    FLASK_SECRET = SECRET_KEY
+    UPLOAD_DIR = 'data/upload'
+    UPLOAD_ALLOWED_EXTENSIONS = {'wav', 'mp3', 'ogg'} 
+    ROUTER = 'tcp://127.0.0.1:5100'
+
+
+class TestingConfig(Config):
+    TESTING = True
