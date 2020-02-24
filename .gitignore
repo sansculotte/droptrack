@@ -1,0 +1,7 @@
+__pycache__
+*.pyc
+venv/
+config.py
+config.json
+data/download/
+data/upload/
