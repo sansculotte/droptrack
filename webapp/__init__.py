@@ -10,6 +10,8 @@ from flask import (
     request,
     render_template,
     redirect,
+    send_from_directory,
+    url_for,
 )
 from .lib import (
     push_to_queue,
@@ -34,7 +36,6 @@ def url():
     """
     Accept soundfile url
     """
-    result = None
     if request.method == 'POST':
         url = request.form.get('url')
         if validate_url(url):
@@ -49,14 +50,16 @@ def upload():
     """
     Accept soundfile upload
     """
-    result = None
     if request.method == 'POST':
         soundfile = request.files.get('soundfile')
         if validate_soundfile(soundfile):
             filename = secure_filename(soundfile.filename)
-            location = os.path.join(current_app.config['UPLOAD_DIR'], filename)
+            location = os.path.join(
+                current_app.config['UPLOAD_DIR'],
+                filename
+            )
             soundfile.save(location)
-            url = 'file://{}'.format(location)
+            url = url_for('download', filename=filename, _external=True)
             push_to_queue(url)
             flash('JUHUUU Erfolg!')
         else:
@@ -65,12 +68,21 @@ def upload():
     return redirect('/')
 
 
+def download(filename):
+    return send_from_directory(
+        current_app.config['UPLOAD_DIR'],
+        filename,
+        as_attachment=True
+    )
+
+
 def setup_routes(app):
     url.methods = ['GET', 'POST']
     upload.methods = ['POST']
     app.add_url_rule('/', 'root', root)
     app.add_url_rule('/url', 'url', url)
-    app.add_url_rule('/soundfile', 'soudfile', upload)
+    app.add_url_rule('/soundfile', 'upload', upload)
+    app.add_url_rule('/soundfile/<path:filename>', 'download', download)
 
 
 def setup_queue(app):

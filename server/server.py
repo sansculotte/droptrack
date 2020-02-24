@@ -4,7 +4,11 @@ import zmq
 
 
 class Server(object):
-
+    """
+    Broker between droptrack webapp and player
+    Publishes urls, so a player subscribed to the soudnfile channel
+    gets realtime updates
+    """
     context = None
 
     def __init__(self, config={}):
@@ -12,6 +16,7 @@ class Server(object):
         self.context = zmq.Context.instance()
         webapp = self.context.socket(zmq.PULL)
         player = self.context.socket(zmq.PUB)
+        router = self.context.socket(zmq.ROUTER)
         webapp.bind(config['sockets']['webapp'])
         player.bind(config['sockets']['player'])
         self.webapp = webapp
@@ -22,16 +27,22 @@ class Server(object):
     def run(self):
         self.poller = zmq.Poller()
         self.poller.register(self.webapp, zmq.POLLIN)
-        print('server listening on {}'.format(self.config['sockets']['webapp']))
+        print('listening on {} and {}'.format(
+            self.config['sockets']['webapp'],
+            self.config['sockets']['player'],
+        ))
 
         while True:
             try:
                 socks = dict(self.poller.poll())
 
+                # listen for urls pushed from webapp
                 if socks.get(self.webapp) == zmq.POLLIN:
                     message = self.webapp.recv_string()
                     print('frontend [{0!r}]'.format(message))
-                    self.player.send_string('{} {}'.format(self.topic, message))
+                    self.player.send_string(
+                        '{} {}'.format(self.topic, message)
+                    )
                     print('published on [{0}]'.format(self.topic))
 
             except KeyboardInterrupt:

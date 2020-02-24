@@ -5,6 +5,8 @@ import zmq
 
 class Collector(object):
 
+    handlers = []
+
     def __init__(self, config):
         self.topic = config.get('topic', 'soundfile')
         self.context = zmq.Context.instance()
@@ -23,8 +25,8 @@ class Collector(object):
                 if socks.get(self.socket) == zmq.POLLIN:
                     offset = len(self.topic) + 1
                     message = self.socket.recv_string()[offset:]
-                    if callable(self.handler):
-                        self.handler(message)
+                    for handler in self.handlers:
+                        handler(message)
 
             except KeyboardInterrupt:
                 print(' signal caught ... shutting down')
@@ -36,4 +38,8 @@ class Collector(object):
         self.context.term()
 
     def register_handler(self, handler):
-        self.handler = handler
+        self.handlers.append(handler)
+
+    def unregister_handler(self, handler):
+        # python should be able to do that, yes?
+        self.handlers = [h for h in self.handlers if h is not handler]

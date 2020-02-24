@@ -1,3 +1,4 @@
+from os import getcwd, path
 from .collector import Collector
 from .store import Store
 from .player import PlayerError
@@ -5,7 +6,8 @@ from .player import PlayerError
 
 config = {
     'server': 'tcp://127.0.0.1:5200',
-    'tracks': './data/download'
+    'webapp': 'http://localhost:5000',
+    'tracks': path.join(getcwd(), 'data/download')
 }
 
 

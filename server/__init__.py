@@ -1,13 +1,8 @@
+import json
 from .server import Server
 
 
-config = {
-    'upload_dir': './data/upload',
-    'sockets': {
-        'webapp': 'tcp://127.0.0.1:5100',
-        'player': 'tcp://127.0.0.1:5200'
-    }
-}
-
+with open('server/config.json', 'r') as configfile:
+    config = json.load(configfile)
 
 server = Server(config)
