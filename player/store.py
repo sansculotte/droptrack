@@ -22,6 +22,9 @@ class Store(object):
             filename = path.basename(components.path)
             location = path.join(self.tracks, filename)
             command = ['curl', '-s', url, '--output', location]
+            # this might also work in case curl is not available
+            # self.download_from_webapp(url, location)
+            # return location
         elif 'soundcloud.com' in components.netloc:
             command = ['soundscrape', '-p', self.tracks, url]
         elif 'bandcamp.com' in components.netloc:
@@ -41,6 +44,11 @@ class Store(object):
             if url.startswith(w):
                 return True
         return False
+
+    def download_from_webapp(self, url, location):
+        with requests.get(url, stream=True) as r:
+            with open(location, 'wb') as f:
+                shutil.copyfileobj(r.raw, f)
 
     def queue_track(self, track_location):
         command = ['mocp', '-a', format(track_location)]
