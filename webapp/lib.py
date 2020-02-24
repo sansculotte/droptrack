@@ -4,7 +4,7 @@ from subprocess import Popen
 
 
 def file_allowed(filename):
-    allowed_extensions = current_app.config.UPLOAD_ALLOWED_EXTENSIONS
+    allowed_extensions = current_app.config.get('UPLOAD_ALLOWED_EXTENSIONS')
     return '.' in filename and \
                filename.rsplit('.', 1)[1].lower() in allowed_extensions
 

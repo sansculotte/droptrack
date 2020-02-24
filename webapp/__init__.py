@@ -4,9 +4,12 @@ import os
 from werkzeug.utils import secure_filename
 from flask import (
     Flask,
+    current_app,
+    flash,
     Response,
     request,
     render_template,
+    redirect,
 )
 from .lib import (
     push_to_queue,
@@ -36,11 +39,10 @@ def url():
         url = request.form.get('url')
         if validate_url(url):
             push_to_queue(url)
-            result = {'message': 'JUHUUU Erfolg!'}
+            flash('JUHUUU Erfolg!')
         else:
-            result = {'message': 'Sorry. Please try again'}
-
-    return render_template('url.html', result=result)
+            flash('Sorry, this did not work. Please try again')
+    return redirect('/')
 
 
 def upload():
@@ -56,11 +58,11 @@ def upload():
             soundfile.save(location)
             url = 'file://{}'.format(location)
             push_to_queue(url)
-            result = {'message': 'JUHUUU Erfolg!'}
+            flash('JUHUUU Erfolg!')
         else:
-            result = {'message': 'Sorry. Upload failed'}
+            flash('Sorry. Upload Failed.')
 
-    return render_template('url.html', result=result)
+    return redirect('/')
 
 
 def setup_routes(app):

@@ -5,7 +5,14 @@
     </head>
     <body>
         <section style="width: 400px; margin-left: auto; margin-right: auto">
-            <h1>{{ config.APP_NAME }}</h1>
+            <h1 style="width: 100%; background-color: black; color: white">{{ config.APP_NAME }}</h1>
+            {% with flash = get_flashed_messages() %}
+                {% if flash %}
+                    <article>
+                    {% for message in flash %}<p>{{ message }}</p>{% endfor %}
+                    </article>
+                {% endif %}
+                {% endwith %}
             {% block content %}
             {% endblock %}
         </section>
