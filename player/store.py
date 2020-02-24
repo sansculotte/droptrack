@@ -1,7 +1,8 @@
+import requests
+import shutil
 from os import path
 from urllib.parse import urlparse
 from subprocess import run, CalledProcessError
-import zmq
 from .player import PlayerError
 
 
@@ -20,7 +21,7 @@ class Store(object):
         if self.from_webapp(url):
             filename = path.basename(components.path)
             location = path.join(self.tracks, filename)
-            command = ['curl', url, '--output', location]
+            command = ['curl', '-s', url, '--output', location]
         elif 'soundcloud.com' in components.netloc:
             command = ['soundscrape', '-p', self.tracks, url]
         elif 'bandcamp.com' in components.netloc:
@@ -42,7 +43,7 @@ class Store(object):
         return False
 
     def queue_track(self, track_location):
-        command = 'mocp -a {}'.format(track_location)
+        command = ['mocp', '-a', format(track_location)]
         try:
             run(command, check=True)
         except CalledProcessError as e:
