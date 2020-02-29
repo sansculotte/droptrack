@@ -1,7 +1,9 @@
 {
     "upload_dir": "./data/upload",
+    "backlog": "./data/backlog.txt",
     "sockets": {
         "webapp": "tcp://127.0.0.1:5100",
-        "player": "tcp://127.0.0.1:5200"
+        "player": "tcp://127.0.0.1:5200",
+        "router": "tcp://127.0.0.1:5210"
     }
 }
