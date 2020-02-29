@@ -27,8 +27,10 @@ class Store(object):
             # return location
         elif 'soundcloud.com' in components.netloc:
             command = ['soundscrape', '-p', self.tracks, url]
+            filename = '?'
         elif 'bandcamp.com' in components.netloc:
             command = ['soundscrape', '-b', '-p', self.tracks, url]
+            filename = '?'
         else:
             raise PlayerError('not soundcloud nor bandcamp')
 
