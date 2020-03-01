@@ -17,17 +17,18 @@ class Collector(object):
         self.socket = self.context.socket(zmq.SUB)
         self.socket.connect(config['server'])
         self.socket.subscribe(self.topic)
+        self.poller = zmq.Poller()
+        self.poller.register(self.socket, zmq.POLLIN)
+
         req = config.get('req')
         if req:
             self.req = self.context.socket(zmq.REQ)
+            self.req.setsockopt(zmq.LINGER, 0)
             self.req.connect(req)
 
         atexit.register(self.shutdown)
 
     def run(self):
-        self.poller = zmq.Poller()
-        self.poller.register(self.socket, zmq.POLLIN)
-
         while True:
             try:
                 socks = dict(self.poller.poll())
@@ -45,6 +46,7 @@ class Collector(object):
         self.poller.unregister(self.socket)
         self.socket.close()
         if self.req:
+            self.poller.unregister(self.req)
             self.req.close()
         self.context.term()
 
@@ -60,8 +62,12 @@ class Collector(object):
             timestamp = self.get_last_sync_time()
             if timestamp:
                 self.req.send_string('backlog {}'.format(timestamp))
-                r = self.req.recv_string()
-                return r == 'ok'
+                self.poller.register(self.req, zmq.POLLIN)
+                if self.poller.poll(1000):
+                    r = self.req.recv_string()
+                    return r == 'ok'
+                else:
+                    print('Timeout waiting for backlog')
 
     def get_last_sync_time(self) -> str:
         if path.exists(self.last_sync):
