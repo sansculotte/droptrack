@@ -13,6 +13,11 @@ config = {
     'last_sync': './data/last_sync'
 }
 
+if path.exists('player/config.json'):
+    with open('server/config.json', 'r') as configfile:
+        for key, value in json.load(configfile).iter():
+            config[key] = value
+
 
 def handler(track_url):
     store = Store(config)
