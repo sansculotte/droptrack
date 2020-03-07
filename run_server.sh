@@ -1,2 +1,2 @@
 #/bin/sh
-python3 -m server
+python3 -m server "$@"
