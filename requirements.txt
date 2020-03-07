@@ -25,3 +25,4 @@ soundscrape==0.30.1
 urllib3==1.25.8
 Werkzeug==1.0.0
 pyzmq==18.1.1
+python-daemon==2.2.4
