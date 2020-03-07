@@ -1,7 +1,10 @@
 __pycache__
 *.pyc
 venv/
+build/
 config.py
 config.json
 data/download/
 data/upload/
+data/backlog.txt
+data/last_sync

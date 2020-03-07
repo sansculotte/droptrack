@@ -5,5 +5,9 @@
         "webapp": "tcp://127.0.0.1:5100",
         "player": "tcp://127.0.0.1:5200",
         "router": "tcp://127.0.0.1:5210"
+    },
+    "logging": {
+        "address": "/dev/log",
+        "facility": "LOG_USER"
     }
 }
