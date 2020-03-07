@@ -16,7 +16,12 @@ if [[ $(uname) == 'Linux' ]]; then # go linux
     fi
   fi
 elif [[ $(uname) == 'FreeBSD' ]]; then
-    pkg install py37-virtualenv libzmq4
+    if [ ! $(pkg info py37-virtualenv) ]; then
+        sudo pkg install py37-virtualenv
+    fi
+    if [ ! $(pkg info libzmq4) ]; then
+        sudo pkg install libzmq4
+    fi
 else
     echo Unknown System. Dont know what to do.
     exit
