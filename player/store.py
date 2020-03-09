@@ -18,7 +18,7 @@ class Store(object):
             self.webapps = config.get('webapps', [])
 
     def download(self, url):
-        print('Store.download self.tracks {0}'.format(self.tracks))
+        print('Store.download from url {1} to self.tracks {0}'.format(self.tracks, url))
         components = urlparse(url)
         if self.from_webapp(url):
             filename = path.basename(components.path)
@@ -35,12 +35,13 @@ class Store(object):
             filename = '?'
         elif 'youtube.com' in components.netloc:
             # command = ['youtube-dl', '-x', '-o', '{0}/%(title)s.%(ext)s'.format(self.tracks), '--audio-format', 'aac', url]
-            command = ['youtube-dl', '-x', '-o', '{0}/%(title)s.%(ext)s'.format(self.tracks), url]
+            command = ['youtube-dl', '-x', '--audio-format', 'aac', '-o', '{0}/%(title)s.%(ext)s'.format(self.tracks), url]
             filename = '?'
         else:
             raise PlayerError('not soundcloud nor bandcamp')
 
         try:
+            print('player.store running command {0}'.format(command))
             run(command, check=True)
         except CalledProcessError:
             print('failed to download from {}'.format(url))
@@ -56,6 +57,7 @@ class Store(object):
 
     def from_webapp(self, url):
         for w in self.webapps:
+            
             if url.startswith(w):
                 return True
         return False
@@ -66,7 +68,7 @@ class Store(object):
                 shutil.copyfileobj(r.raw, f)
 
     def queue_track(self, track_location):
-        command = ['mocp', '-a', format(track_location)]
+        command = ['mocp', '--append', '--enqueue', '{0}'.format(track_location)]
         try:
             run(command, check=True)
         except CalledProcessError as e:
