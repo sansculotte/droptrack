@@ -22,10 +22,6 @@ def validate_soundfile(soundfile):
         return file_allowed(soundfile.filename)
 
 
-def push_to_queue(url):
-    current_app.queue.send(url)
-
-
 def download(url):
     scheme, netloc, path, *_ = urlparse(url)
     cmd = f'soundscrape {scheme}{netloc}/{path}'

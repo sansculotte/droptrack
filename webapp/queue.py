@@ -1,15 +1,24 @@
+from contextlib import contextmanager
 import zmq
 
 class Queue(object):
 
     def __init__(self, config):
         self.context = zmq.Context.instance()
-        self.socket = self.context.socket(zmq.PUSH)
-        self.socket.connect(config['ROUTER'])
+        self.config = config
+
+    @contextmanager
+    def socket(self):
+        try:
+            socket = self.context.socket(zmq.PUSH)
+            socket.connect(self.config['ROUTER'])
+            yield socket
+        finally:
+            socket.close()
 
     def send(self, msg):
-        self.socket.send_string(msg)
+        with self.socket() as socket:
+            socket.send_string(msg)
 
     def shutdown(self):
-        self.socket.close()
         self.context.term()

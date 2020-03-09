@@ -16,7 +16,6 @@ from flask import (
     url_for,
 )
 from .lib import (
-    push_to_queue,
     validate_url,
     validate_soundfile,
     download
@@ -41,7 +40,7 @@ def url():
     if request.method == 'POST':
         url = request.form.get('url')
         if validate_url(url):
-            push_to_queue(url)
+            current_app.queue.send(url)
             flash('JUHUUU Erfolg!')
         else:
             flash('Sorry, this did not work. Please try again')
@@ -62,7 +61,7 @@ def upload():
             )
             soundfile.save(location)
             url = url_for('download', filename=filename, _external=True)
-            push_to_queue(url)
+            current_app.queue.send(url)
             flash('JUHUUU Erfolg!')
         else:
             flash('Sorry. Upload Failed.')
@@ -89,6 +88,7 @@ def setup_routes(app):
 
 def setup_queue(app):
     app.queue = Queue(app.config)
+    atexit.register(app.queue.shutdown)
 
 
 def setup_logging(app):
@@ -119,5 +119,4 @@ def create_app():
     setup_routes(app)
     setup_queue(app)
     setup_logging(app)
-    atexit.register(app.queue.shutdown)
     return app
