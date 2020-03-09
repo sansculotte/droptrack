@@ -9,7 +9,7 @@ from .backlog import Backlog
 class Server(object):
     """
     Broker between droptrack webapp and player
-    Publishes urls, so a player subscribed to the soudnfile channel
+    Publishes urls, so a player subscribed to the soundfile channel
     gets realtime updates
     """
     context = None
@@ -112,7 +112,7 @@ class Server(object):
                 sys.exit()
 
     def shutdown(self):
-        self.logger.info('shuttong down')
+        self.logger.info('shutting down')
         if self.poller:
             self.poller.unregister(self.webapp)
         self.webapp.close()
