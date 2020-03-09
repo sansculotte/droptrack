@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import atexit
+from logging import Formatter
+from logging.handlers import SysLogHandler
 import os
 from werkzeug.utils import secure_filename
 from flask import (
@@ -89,6 +91,20 @@ def setup_queue(app):
     app.queue = Queue(app.config)
 
 
+def setup_logging(app):
+    formatter = Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    default_level = 'debug' if app.config['DEBUG'] else 'info'
+    address = app.config.get('LOG_ADDRESS', '/dev/log')
+    facility = app.config.get('LOG_FACILITY', 'LOG_SYSLOG')
+    level = app.config.get('LOG_LEVEL', default_level)
+    handler = SysLogHandler(
+        address=address,
+        facility=SysLogHandler.__dict__[facility],
+    )
+    handler.setFormatter(formatter)
+    app.logger.addHandler(handler)
+
+
 def create_app():
     """
     Using the app-factory pattern
@@ -102,5 +118,6 @@ def create_app():
     app.config.from_object(APP_ENV)
     setup_routes(app)
     setup_queue(app)
+    setup_logging(app)
     atexit.register(app.queue.shutdown)
     return app

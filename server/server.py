@@ -33,6 +33,9 @@ class Server(object):
         atexit.register(self.shutdown)
 
     def setup_logging(self, config):
+        """
+        Logging comes in handy when server is daemonized
+        """
         logging_config = config.get('logging')
         formatter = Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         level = 'debug'
