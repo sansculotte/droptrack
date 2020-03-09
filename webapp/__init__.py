@@ -19,7 +19,7 @@ from .lib import (
     validate_soundfile,
     download
 )
-from .queue import Queue
+from webapp.queue import Queue
 
 
 try:
