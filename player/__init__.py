@@ -12,7 +12,7 @@ from .player import PlayerError
 
 config = {
     'server': 'tcp://127.0.0.1:5200',
-    'webapp': 'http://localhost:5000',
+    'webapp': 'http://127.0.0.1:5000',
     'req': 'tcp://127.0.0.1:5210',
     'tracks': path.join(getcwd(), 'data/download'),
     'last_sync': './data/last_sync'
