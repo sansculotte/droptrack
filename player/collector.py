@@ -35,6 +35,7 @@ class Collector(object):
                 if socks.get(self.socket) == zmq.POLLIN:
                     offset = len(self.topic) + 1
                     message = self.socket.recv_string()[offset:]
+                    print('message {0}'.format(message))
                     for handler in self.handlers:
                         handler(message)
 

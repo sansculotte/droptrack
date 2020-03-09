@@ -83,10 +83,11 @@ class Server(object):
                     message = self.webapp.recv_string()
                     self.logger.debug('frontend [{0!r}]'.format(message))
                     self.backlog.prepend(message)
+                    message_full = '{} {}'.format(self.topic, message)
                     self.player.send_string(
-                        '{} {}'.format(self.topic, message)
+                        message_full
                     )
-                    self.logger.debug('published on [{0}]'.format(self.topic))
+                    self.logger.debug('published on [{0}]'.format(message_full))
 
                 # listen for requests from player
                 if socks.get(self.router) == zmq.POLLIN:
@@ -103,9 +104,10 @@ class Server(object):
                         else:
                             self.router.send_string('ok')
                             for entry in self.backlog.get_since(timestamp):
-                                self.player.send_string(entry)
+                                message_full = '{} {}'.format(self.topic, entry)
+                                self.player.send_string(message_full)
                                 self.logger.debug(
-                                    'sent on router: [{0}]'.format(entry)
+                                    'sent on router: [{0}]'.format(message_full)
                                 )
                     else:
                         self.router.send_string('error')
