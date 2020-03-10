@@ -82,6 +82,10 @@ def build():
         local_app_dir,
         local_build_dir
     ))
+    local('cp {0}/server/config.json.{1} server/config.json'.format(
+        local_build_dir,
+        env.target
+    ))
     set_version()
     local('rm -Rf %s/webapp-js' % local_build_dir)
     local('rm -Rf %s/etc' % local_build_dir)
