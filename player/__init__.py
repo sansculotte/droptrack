@@ -41,7 +41,7 @@ def main():
 
     def callback(*args):
         print('callback', args)
-    
+
     def backlog_req_func(*args, **kwargs):
         print('backlog request')
         if collector.request_backlog():
@@ -49,8 +49,7 @@ def main():
         else:
             print('backlog sync failed')
 
-    thr = threading.Thread(target=backlog_req_func, args=(), kwargs={})
-    thr.start() # Will run "foo"
-    # backlog_req = pool.apply_async(backlog_req_func, [], callback=callback)
-    
+    thread = threading.Thread(target=backlog_req_func, args=(), kwargs={})
+    thread.start()
+
     collector.run()
