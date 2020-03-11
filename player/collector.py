@@ -36,6 +36,7 @@ class Collector(object):
                     offset = len(self.topic) + 1
                     message = self.socket.recv_string()[offset:]
                     print('message {0}'.format(message))
+                    self.write_sync_time()
                     for handler in self.handlers:
                         handler(message)
 
@@ -74,8 +75,13 @@ class Collector(object):
         if path.exists(self.last_sync):
             with open(self.last_sync, 'r') as f:
                 return f.read()
-        return '{:10.8}'.format(time() - 60 * 60 * 60 * 24)
+        return self.timestamp
 
-    def write_sync_time(self, timestamp):
+    def write_sync_time(self, timestamp=None):
+        timestamp = timestamp or self.timestamp
         with open(self.last_sync, 'w') as f:
             f.write('{:10.8f}'.format(timestamp))
+
+    @property
+    def timestamp(self):
+        return '{:10.8}'.format(time() - 60 * 60 * 60 * 24)

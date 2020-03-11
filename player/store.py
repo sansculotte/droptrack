@@ -42,7 +42,7 @@ class Store(object):
             trkid = int(trackinfo['id'])
         else:
             trkid = self.tracklog.index.max() + 1
-            
+
         if self.from_webapp(url):
             filename = path.basename(components.path)
             location = path.join(self.tracks, filename)
@@ -64,7 +64,7 @@ class Store(object):
             print('    ytid =', ytid)
             filename = '?'
         else:
-            raise PlayerError('not soundcloud nor bandcamp')
+            raise PlayerError('not soundcloud nor bandcamp nor youtube')
 
         try:
             print('player.store running command {0}'.format(command))
@@ -89,7 +89,7 @@ class Store(object):
                 print('ytid filename', filename)
                 filename = filename.split('/')[-1]
                 print('ytid filename', filename)
-                
+
             # print('filename', filename)
             row = [trkid, url, filename, self.tracks + filename, None, None, None]
             # print('    insert row', row)
