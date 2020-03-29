@@ -3,6 +3,7 @@ import sys
 import zmq
 from os import path
 from time import time
+from typing import Callable
 
 
 class Collector(object):
@@ -52,14 +53,14 @@ class Collector(object):
             self.req.close()
         self.context.term()
 
-    def register_handler(self, handler):
+    def register_handler(self, handler: Callable):
         self.handlers.append(handler)
 
     def unregister_handler(self, handler):
         # python should be able to do that, yes?
         self.handlers = [h for h in self.handlers if h is not handler]
 
-    def request_backlog(self):
+    def request_backlog(self) -> bool:
         if self.req:
             timestamp = self.get_last_sync_time()
             if timestamp:
@@ -70,6 +71,7 @@ class Collector(object):
                     return r == 'ok'
                 else:
                     print('Timeout waiting for backlog')
+        return False
 
     def get_last_sync_time(self) -> str:
         if path.exists(self.last_sync):
@@ -77,11 +79,10 @@ class Collector(object):
                 return f.read()
         return self.timestamp
 
-    def write_sync_time(self, timestamp=None):
-        timestamp = timestamp or self.timestamp
+    def write_sync_time(self):
         with open(self.last_sync, 'w') as f:
-            f.write('{:10.8f}'.format(timestamp))
+            f.write(self.timestamp)
 
     @property
-    def timestamp(self):
+    def timestamp(self) -> str:
         return '{:10.8}'.format(time() - 60 * 60 * 60 * 24)
