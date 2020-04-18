@@ -3,24 +3,12 @@ import atexit
 from logging import Formatter
 from logging.handlers import SysLogHandler
 import os
-from werkzeug.utils import secure_filename
 from flask import (
     Flask,
-    current_app,
-    flash,
-    Response,
-    request,
     render_template,
-    redirect,
-    send_from_directory,
-    url_for,
 )
-from .lib import (
-    validate_url,
-    validate_soundfile,
-    download
-)
-from webapp.queue import Queue
+from .queue import Queue
+from .api import api
 
 
 try:
@@ -30,60 +18,12 @@ except KeyError:
 
 
 def root():
-    return render_template('url.html')
-
-
-def url():
-    """
-    Accept soundfile url
-    """
-    if request.method == 'POST':
-        url = request.form.get('url')
-        if validate_url(url):
-            current_app.queue.send(url)
-            flash('JUHUUU Erfolg!')
-        else:
-            flash('Sorry, this did not work. Please try again')
-    return redirect('/')
-
-
-def upload():
-    """
-    Accept soundfile upload
-    """
-    if request.method == 'POST':
-        soundfile = request.files.get('soundfile')
-        if validate_soundfile(soundfile):
-            filename = secure_filename(soundfile.filename)
-            location = os.path.join(
-                current_app.config['UPLOAD_DIR'],
-                filename
-            )
-            soundfile.save(location)
-            url = url_for('download', filename=filename, _external=True)
-            current_app.queue.send(url)
-            flash('JUHUUU Erfolg!')
-        else:
-            flash('Sorry. Upload Failed.')
-
-    return redirect('/')
-
-
-def download(filename):
-    return send_from_directory(
-        current_app.config['UPLOAD_DIR'],
-        filename,
-        as_attachment=True
-    )
+    return render_template('main.html')
 
 
 def setup_routes(app):
-    url.methods = ['GET', 'POST']
-    upload.methods = ['POST']
     app.add_url_rule('/', 'root', root)
-    app.add_url_rule('/url', 'url', url)
-    app.add_url_rule('/soundfile', 'upload', upload)
-    app.add_url_rule('/soundfile/<path:filename>', 'download', download)
+    app.register_blueprint(api)
 
 
 def setup_queue(app):

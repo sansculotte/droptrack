@@ -20,8 +20,3 @@ def validate_soundfile(soundfile):
         return False
     else:
         return file_allowed(soundfile.filename)
-
-
-def download(url):
-    scheme, netloc, path, *_ = urlparse(url)
-    cmd = f'soundscrape {scheme}{netloc}/{path}'

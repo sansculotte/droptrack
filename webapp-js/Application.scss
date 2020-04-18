@@ -1,0 +1,45 @@
+main.app {
+  margin-left: auto;
+  margin-right: auto;
+  width: 600px;
+  padding: 0;
+  font-family: Helvetica, sans-serif;
+  h1 {
+    padding: 10px;
+    background-color: #444444;
+    color: #f0f0f0;
+  }
+  form {
+    display: grid;
+    grid-gap: 20px;
+    grid-template: repeat(2, 1fr);
+    &>div, select, input[type="text"], label {
+      grid-column: 1 / span 2;
+      width: 100%;
+    }
+    input[type="button"] {
+      grid-column: 2 / span 1;
+      background-color: #990000;
+      color: white;
+      border: none;
+      font-weight: 600;
+    }
+    input[type="number"] {
+      width: 100%;
+    }
+    input {
+      text-indent: 10px;
+    }
+    input, select {
+      height: 40px;
+      box-sizing: border-box;
+      border: 2px solid silver;
+    }
+  }
+}
+
+@media screen and (max-width: 37.5em) {
+  main.app {
+    width: 100%;
+  }
+}
