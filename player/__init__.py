@@ -78,6 +78,11 @@ def main():
         dest='tracklog', action='store', default=config.get('tracklog'),
         help='path to tracklog file'
     )
+    ap.add_argument(
+        '-n', '--no-sync',
+        dest='sync_backlog', action='store_false',
+        help='url for server zmq subscription channel'
+    )
     args = ap.parse_args()
 
     collector = Collector(args)
@@ -91,7 +96,8 @@ def main():
         else:
             print('backlog sync failed')
 
-    thread = threading.Thread(target=backlog_req_func, args=(), kwargs={})
-    thread.start()
+    if args.sync_backlog:
+        thread = threading.Thread(target=backlog_req_func, args=(), kwargs={})
+        thread.start()
 
     collector.run()
