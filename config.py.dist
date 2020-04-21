@@ -23,6 +23,7 @@ class ProductionConfig(Config):
     DEBUG = False
     DEVELOPMENT = False
     SERVER_NAME = 'drop.sansculotte.net'
+    API_URL = SERVER_NAME
     SECRET_KEY = '4Bp2qR-98qRwL-O8qVVWfS-GUFt15GR405h16WF0euK8uH1K-EdHD5lpxRsMxI8U'
     UPLOAD_DIR = '/opt/droptrack/upload'
 
