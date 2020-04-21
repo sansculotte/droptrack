@@ -38,13 +38,13 @@ class Store(object):
     """
 
     def __init__(self, config):
-        self.tracks = config.get('tracks', '/tmp')
-        self.tracklog_filename = config.get('tracklog', 'tracklog.csv')
-        webapp = config.get('webapp')
+        self.tracks = config.tracks
+        self.tracklog_filename = config.tracklog
+        webapp = config.webapp
         if webapp:
             self.webapps = [webapp]
         else:
-            self.webapps = config.get('webapps', [])
+            self.webapps = config.webapps
 
         self.setup_tracklog()
 

@@ -1,3 +1,4 @@
+from argparse import Namespace
 import atexit
 import sys
 import zmq
@@ -11,17 +12,17 @@ class Collector(object):
     handlers = []
     req = None
 
-    def __init__(self, config):
-        self.last_sync = config.get('last_sync', './data/last_sync')
-        self.topic = config.get('topic', 'soundfile')
+    def __init__(self, config: Namespace):
+        self.last_sync = config.last_sync
+        self.topic = config.topic
         self.context = zmq.Context.instance()
         self.socket = self.context.socket(zmq.SUB)
-        self.socket.connect(config['server'])
+        self.socket.connect(config.server)
         self.socket.subscribe(self.topic)
         self.poller = zmq.Poller()
         self.poller.register(self.socket, zmq.POLLIN)
 
-        req = config.get('req')
+        req = config.req
         if req:
             self.req = self.context.socket(zmq.REQ)
             self.req.setsockopt(zmq.LINGER, 0)
