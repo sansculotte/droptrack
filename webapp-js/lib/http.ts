@@ -1,5 +1,4 @@
 declare var API_URL: string
-var API_URL = 'http://localhost:5000'
 import 'whatwg-fetch'
 
 interface ApiData {
