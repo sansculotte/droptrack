@@ -73,8 +73,7 @@ def prepare_build():
 def build():
     print("Building %s" % revision)
     prepare_build()
-    print('skipping assets. nothing to do yet')
-    # assets()
+    assets()
     local('git archive HEAD | tar -f - -xC {}'.format(
         os.path.join(local_app_dir, local_build_dir)
     ))

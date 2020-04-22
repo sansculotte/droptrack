@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-import zmq
+import zmq # type: ignore
 
 class Queue(object):
 

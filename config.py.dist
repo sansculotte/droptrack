@@ -6,13 +6,15 @@ class Config(object):
     DEBUG = True
     DEVELOPMENT = True
     SECRET_KEY = 'secret'
+    SERVER_NAME = 'localhost:5000'
+    API_URL = 'http://' + SERVER_NAME
     FLASK_SECRET = SECRET_KEY
     UPLOAD_DIR = os.path.join(os.getcwd(), 'data/upload')
     UPLOAD_ALLOWED_EXTENSIONS = {'wav', 'mp3', 'ogg'} 
     ROUTER = 'tcp://127.0.0.1:5100'
 
 
-class ProductionConfig(Config):
+class StagingConfig(Config):
     DEBUG = False
     DEVELOPMENT = False
     SECRET_KEY = '4Bp2qR-98qRwL-O8qVVWfS-GUFt15GR405h16WF0euK8uH1K-EdHD5lpxRsMxI8U'
@@ -22,6 +24,8 @@ class ProductionConfig(Config):
 class ProductionConfig(Config):
     DEBUG = False
     DEVELOPMENT = False
+    SERVER_NAME = 'drop.sansculotte.net'
+    API_URL = 'http://' + SERVER_NAME
     SECRET_KEY = '4Bp2qR-98qRwL-O8qVVWfS-GUFt15GR405h16WF0euK8uH1K-EdHD5lpxRsMxI8U'
     UPLOAD_DIR = '/opt/droptrack/upload'
 

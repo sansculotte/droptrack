@@ -8,6 +8,9 @@ Requirements
 ------------
 
 python3.6+
+pip
+node
+npm
 curl
 moc
 zmq
@@ -16,5 +19,26 @@ zmq
 Setup
 -----
 
-On the web interface, run webapp and server,
-on the local device, run moc and player.
+Setup your python environment, virtualenv or other method.
+
+Setup node environment, nvm or other method.
+
+Install python dependencies
+
+    pip install -r requirements
+
+For development:
+
+    pip install -r dev-requirements
+
+
+*Webapp/Server*
+
+    npm install
+    npm run build
+    ./run_webapp.sh
+    ./run_server.sh
+
+*Player*
+
+    ./run_player.sh
