@@ -21,17 +21,17 @@ def root():
     return render_template('main.html')
 
 
-def setup_routes(app):
+def setup_routes(app: Flask):
     app.add_url_rule('/', 'root', root)
     app.register_blueprint(api)
 
 
-def setup_queue(app):
+def setup_queue(app: Flask):
     app.queue = Queue(app.config)
     atexit.register(app.queue.shutdown)
 
 
-def setup_logging(app):
+def setup_logging(app: Flask):
     formatter = Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     default_level = 'debug' if app.config['DEBUG'] else 'info'
     address = app.config.get('LOG_ADDRESS', '/dev/log')
@@ -45,7 +45,7 @@ def setup_logging(app):
     app.logger.addHandler(handler)
 
 
-def create_app():
+def create_app() -> Flask:
     """
     Using the app-factory pattern
     :return Flask:

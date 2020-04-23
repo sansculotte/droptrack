@@ -9,12 +9,12 @@ def file_allowed(filename):
                filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
 
-def validate_url(url):
+def validate_url(url: str) -> bool:
     return url.startswith('http://') \
         or url.startswith('https://')
 
 
-def validate_soundfile(soundfile):
+def validate_soundfile(soundfile) -> bool:
     if soundfile is None or soundfile.filename == '':
         current_app.logger.info('No file')
         return False
