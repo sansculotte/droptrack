@@ -1,6 +1,6 @@
 import atexit
 import sys
-import zmq
+import zmq  # type: ignore
 from logging import getLogger, Formatter, StreamHandler
 from logging.handlers import SysLogHandler
 from .backlog import Backlog

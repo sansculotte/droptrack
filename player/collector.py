@@ -1,15 +1,15 @@
+from typing import Callable, List
 from argparse import Namespace
 import atexit
 import sys
-import zmq
+import zmq  # type: ignore
 from os import path
 from time import time
-from typing import Callable
 
 
 class Collector(object):
 
-    handlers = []
+    handlers: List[Callable] = []
     req = None
 
     def __init__(self, config: Namespace):

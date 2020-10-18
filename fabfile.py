@@ -36,6 +36,11 @@ def test():
 
 
 @task
+def typecheck():
+    local("mypy webapp server player")
+
+
+@task
 def clean():
     local('rm -Rf {}/*'.format(local_build_dir))
     local('rm -Rf {}/*'.format(local_js_target_dir))
