@@ -15,16 +15,16 @@ interface State {
 
 export default class ExpireMessage extends React.Component<Props, State> {
 
-  timer: any
+  timer: number | undefined
 
   constructor(props: Props) {
     super(props)
-    this.timer = null
+    this.timer = undefined
     this.state = {visible: true}
   }
 
-  public componentWillReceiveProps(nextProps: Props, prevProps: Props) {
-    if (nextProps.children !== prevProps.children) {
+  public componentDidUpdate(prevProps: Props) {
+    if (this.props.children !== prevProps.children) {
       this.setTimer()
       this.setState({visible: true})
     }
@@ -46,14 +46,14 @@ export default class ExpireMessage extends React.Component<Props, State> {
 
   private setTimer() {
     // clear any existing timer
-    if (this.timer !== null) {
+    if (this.timer !== undefined) {
       clearTimeout(this.timer)
     }
 
     // hide after `delay` milliseconds
     this.timer = setTimeout(() => {
         this.setState({visible: false})
-        this.timer = null
+        this.timer = undefined
       },
       this.props.delay
     )
