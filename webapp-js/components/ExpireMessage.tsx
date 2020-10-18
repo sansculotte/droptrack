@@ -4,7 +4,7 @@ import * as style from './ExpireMessage.scss'
 
 
 interface Props {
-  delay?: number
+  delay: number
   children: React.ReactNode
 }
 
