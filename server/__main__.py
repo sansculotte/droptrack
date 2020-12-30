@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from daemon import DaemonContext
+from daemon import DaemonContext  # type: ignore
 from . import server
 
 

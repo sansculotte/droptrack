@@ -1,4 +1,4 @@
 export default interface ApiResponse {
-  status: number,
+  status: number
   message: string
 }

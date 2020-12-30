@@ -7,6 +7,7 @@ import UploadSymbol from 'components/UploadSymbol'
 
 interface Props {
   onDrop: (args: Array<any>) => void
+  accept: string
 }
 
 const FileDrop = (props: Props) => {
@@ -15,7 +16,7 @@ const FileDrop = (props: Props) => {
     getRootProps,
     getInputProps,
     isDragActive
-  } = useDropzone({onDrop, accept: 'audio/*'})
+  } = useDropzone({onDrop, accept: props.accept})
 
   return (
     <div {...getRootProps()}>

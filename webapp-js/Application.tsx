@@ -35,9 +35,15 @@ class Application extends React.Component<Props, State> {
           <ExpireMessage delay={2000}>{this.state.message}</ExpireMessage>
         }
         <form>
-          <input name="url" type="url" placeholder="soundfile url" onChange={this.handleChangeUrl.bind(this)} value={this.state.url} />
+          <input
+            name="url"
+            type="url"
+            placeholder="soundfile url"
+            onChange={this.handleChangeUrl.bind(this)}
+            value={this.state.url}
+          />
           <input type="button" onClick={this.handleDropUrl.bind(this)} value="Drop" />
-          <FileDrop onDrop={this.handleDropFile.bind(this)} />
+          <FileDrop accept="audio/*" onDrop={this.handleDropFile.bind(this)} />
         </form>
       </main>
     )
@@ -45,11 +51,14 @@ class Application extends React.Component<Props, State> {
 
   handleDropFile(files: Array<any>) {
     const results = files.map(f => http.upload('/upload', f, 'soundfile'))
-    if (results.length > 1) {
+    if (results.length > 0) {
       results[0].then((response: ApiResponse) => {
         const { message } = response
         this.setState({message})
       }).catch((error: ApiResponse) => console.error(error))
+    }
+    else {
+        console.error('no files')
     }
   }
 

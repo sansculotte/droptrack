@@ -7,8 +7,8 @@ from urllib.parse import urlparse
 from subprocess import run, CalledProcessError
 from .player import PlayerError
 
-import pandas as pd
-from soundscrape import soundscrape
+import pandas as pd  # type: ignore
+from soundscrape import soundscrape  # type: ignore
 
 
 def mocp_enqueue(location):
@@ -153,13 +153,17 @@ class Store(object):
         else:
             # filename is the entry matching the youtube id
             # filename = files[files.index(ytid)]
-            filenames = list([f for f in files if ytid in f])
+            filenames = [f for f in files if ytid in f]
             if len(filenames) > 0:
                 print('ytid filename', filename)
                 filename = filenames[0]
-                print('ytid filename', filename)
-                filename = filename.split('/')[-1]
-                print('ytid filename', filename)
+                if filename:
+                    print('ytid filename', filename)
+                    filename = filename.split('/')[-1]
+                    print('ytid filename', filename)
+                else:
+                    filename = 'N/A'
+                    print('could not generate filename')
             else:
                 filename = 'N/A'
                 print('could not generate filename')
