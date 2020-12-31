@@ -4,11 +4,20 @@ main.app {
   width: 600px;
   padding: 0;
   font-family: Helvetica, sans-serif;
+  
   h1 {
     padding: 10px;
     background-color: #444444;
     color: #f0f0f0;
-  }
+  };
+  
+  h2 {
+    padding: 10px;
+    background-color: #444444;
+    color: #f0f020;
+    font-size: 80%;
+  };
+  
   form {
     display: grid;
     grid-gap: 20px;

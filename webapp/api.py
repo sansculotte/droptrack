@@ -156,14 +156,17 @@ def item() -> Response:
 
     # item content
     if os.path.isdir(dt_item_path):
-        dt_item_content = dict([(dt_item + "_" + _, os.path.join(dt_item_path, _)) for _ in os.listdir(dt_item_path)])
+        # dt_item_content = dict([(dt_item + "_" + _, os.path.join(dt_item_path, _)) for _ in os.listdir(dt_item_path)])
+        dt_item_content = [{
+            'dt_item': dt_item + "_" + _,
+            'dt_item_path': os.path.join(dt_item_path, _)} for _ in os.listdir(dt_item_path)]
     elif os.path.isfile(dt_item_path):
         dt_item_copy = [_ for _ in current_app.dt_data if _ == dt_item][0]
-        dt_item_content = {
+        dt_item_content = [{
             'size': os.path.getsize(dt_item_path),
             # 'dt_item': dt_item,
             'dt_item_copy': dt_item_copy,
-        }
+        }]
         # dt_item_content = [os.path.join(dt_item_path, _) for _ in  os.listdir(dt_item_path)]
 
     
