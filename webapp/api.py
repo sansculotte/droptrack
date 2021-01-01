@@ -23,6 +23,8 @@ from .lib import (
     validate_soundfile,
 )
 
+from .filesys import walkdirlist
+
 from multiprocessing import Process
 
 from .smp_audio_tasks import ns2kw, kw2ns
@@ -295,7 +297,10 @@ def upload() -> Response:
             current_app.queue.send(url)
 
             # update app.dt_data
-            current_app.dt_data_list = walkdirlist(startpath='data/dt_sessions', absroot='/home/src/QK/droptrack/data/dt_sessions')
+            current_app.dt_data_list = walkdirlist(
+                startpath=current_app.dt_sessions_dir,
+                absroot=current_app.config.get('DATA_DIR'),
+            )
 
             # return response
             return api_response_ok({
