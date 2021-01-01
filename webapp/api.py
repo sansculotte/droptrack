@@ -63,7 +63,6 @@ returns: list of itemrefs
 
 
 """
-
 @api.route('/autoedit', methods=['GET', 'POST'])
 def autoedit() -> Response:
     """autoedit
