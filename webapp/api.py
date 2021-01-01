@@ -72,38 +72,67 @@ def autoedit() -> Response:
     dt_item = 'None'
     if request.method == 'POST':
         request_data = request.form
+        # request_data = request.files
     elif request.method == 'GET':
         request_data = request.args
 
+    # current_app.logger.info(f'request.files {request.files}')
+    current_app.logger.info(f'request.form {request.form}')
+        
     if 'dt_item' in request_data:
         dt_item = request_data['dt_item']
     elif 'dt_item' not in request_data and 'dt_session' in request_data:
         dt_item = request_data['dt_session']
+    elif 'dt_item[]' in request_data:
+        dt_item = request_data.getlist('dt_item[]')
+        # current_app.logger.info(f'dt_item {len(dt_item)}')
+        # for dt_item_i in request_data['dt_item[]']:
+        #     current_app.logger.info(f'dt_item_i {dt_item_i}')
+        #     dt_item = [_ for _ in request_data['dt_item[]']]
+        
+    current_app.logger.info(f'dt_item {type(dt_item)} {dt_item}')
+
+    # # do the work and get the item
+    # if dt_item in current_app.dt_data:
+    #     dt_item_path = current_app.dt_data[dt_item]['path']
+    #     current_app.logger.info(f'item dt_item[path] {dt_item_path}')
 
     # do the work and get the item
-    if dt_item in current_app.dt_data:
-        dt_item_path = current_app.dt_data[dt_item]['path']
-        current_app.logger.info(f'item dt_item[path] {dt_item_path}')
+    # if dt_item_dict in current_app.dt_data_list:
+    
+    if type(dt_item) in [list]:
+        dt_item_dict = []
+        for dt_item_ in dt_item:
+            dt_item_dict += [_ for _ in current_app.dt_data_list if _['dt_item'] == dt_item_]
+    else:
+        dt_item_dict = [_ for _ in current_app.dt_data_list if _['dt_item'] == dt_item]
+    dt_item_path = []
+    # if len(dt_item_dict) > 0:
+    for dt_item_dict_i in dt_item_dict:
+        dt_item_path.append(dt_item_dict_i['dt_item_path'])
+    current_app.logger.info(f'item dt_item_path {dt_item_path}')
 
     # Create a daemonic process with heavy "my_func"
     heavy_process = Process(  
         # target=my_func,
         target=run_autoedit_2,
         kwargs={
-            'filenames': [dt_item_path],
+            'filenames': dt_item_path,
             'assemble_mode': 'random',
             'numsegs': 60,
             'duration': 45,
             'seed': 1234,
+            'verbose': False,
+            'rootdir': 'data/dt_sessions/zniz'
         },
-        daemon=True,
+        daemon=False,
     )
     heavy_process.start()
     return api_response_started({
-        'message': 'my_func started',
+        'message': 'autoedit started',
     })
 
-# Define some heavy function
+# async testing, define some heavy function
 def my_func(**kwargs):
     import time
     current_app.logger.info(f"my_func Process start with {kwargs}")
@@ -147,28 +176,42 @@ def item() -> Response:
     #         return api_response_error({'message': 'Invalid url'})
     # return Response(status=405)
 
-    current_app.logger.info(f'item dt_item {dt_item}')
+    current_app.logger.info(f'item requested dt_item {dt_item}')
 
+    # # do the work and get the item
+    # if dt_item in current_app.dt_data:
+    #     dt_item_path = current_app.dt_data[dt_item]['path']
+    #     current_app.logger.info(f'item dt_item[path] {dt_item_path}')
+    # else:
+    #     dt_item_path = "None"
+        
     # do the work and get the item
-    if dt_item in current_app.dt_data:
-        dt_item_path = current_app.dt_data[dt_item]['path']
+    # if dt_item in current_app.dt_data:
+    dt_item_dict = [_ for _ in current_app.dt_data_list if _['dt_item'] == dt_item]
+    if len(dt_item_dict) > 0:
+        # dt_item_path = current_app.dt_data[dt_item]['path']
+        dt_item_path = dt_item_dict[-1]['dt_item_path']
         current_app.logger.info(f'item dt_item[path] {dt_item_path}')
-
+    else:
+        dt_item_path = "None"
+        
     # item content
     if os.path.isdir(dt_item_path):
         # dt_item_content = dict([(dt_item + "_" + _, os.path.join(dt_item_path, _)) for _ in os.listdir(dt_item_path)])
         dt_item_content = [{
-            'dt_item': dt_item + "_" + _,
+            'dt_item': os.path.join(dt_item, _),
             'dt_item_path': os.path.join(dt_item_path, _)} for _ in os.listdir(dt_item_path)]
     elif os.path.isfile(dt_item_path):
-        dt_item_copy = [_ for _ in current_app.dt_data if _ == dt_item][0]
+        # dt_item_copy = [_ for _ in current_app.dt_data if _ == dt_item][0]
+        dt_item_copy = dt_item_dict[-1]['dt_item']
         dt_item_content = [{
             'size': os.path.getsize(dt_item_path),
             # 'dt_item': dt_item,
             'dt_item_copy': dt_item_copy,
         }]
         # dt_item_content = [os.path.join(dt_item_path, _) for _ in  os.listdir(dt_item_path)]
-
+    else:
+        dt_item_content = []
     
     return api_response_ok({
         'message': 'item OK',

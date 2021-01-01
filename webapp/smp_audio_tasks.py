@@ -31,6 +31,7 @@ def run_autoedit_2(*args, **kwargs):
     args_ns.numsegs = int(args_ns.numsegs)
     args_ns.seed = int(args_ns.seed)
     args_ns.duration = int(args_ns.duration)
+    # args_ns.verbose = False
 
     # # tracklist = pd.read_csv('{0}_{1}.csv'.format(data_conf['trackstore_filename_base'], username))
     # tracklist_filename = '{0}_{1}.csv'.format(data_conf['trackstore_filename_base'], username)

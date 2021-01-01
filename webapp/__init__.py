@@ -14,6 +14,7 @@ from flask import (
 )
 from .queue import Queue
 from .api import api
+from .filesys import walkdirlist
 # from .session import dtsession
 
 ############################################################
@@ -113,16 +114,28 @@ def setup_logging(app: Flask):
 
 
 def setup_data(app: Flask):
-    dt_data = {
-        'zniz': {'path': os.path.join(app.config.get('DATA_DIR'), 'dt_sessions', 'zniz')},
-        'zniz_ul': {'path': os.path.join(app.config.get('DATA_DIR'), 'dt_sessions', 'zniz', 'uploaded')},
-        'zniz_gt': {'path': os.path.join(app.config.get('DATA_DIR'), 'dt_sessions', 'zniz', 'generated')},
-        'zniz_ul_trk009-3.mp3': {'path': os.path.join(app.config.get('DATA_DIR'), 'dt_sessions', 'zniz', 'uploaded', 'trk009-3.mp3')},
-        'zniz_ul_trk010-3.mp3': {'path': os.path.join(app.config.get('DATA_DIR'), 'dt_sessions', 'zniz', 'uploaded', 'trk010-3.mp3')},
-        'zniz_ul_trk011-3.mp3': {'path': os.path.join(app.config.get('DATA_DIR'), 'dt_sessions', 'zniz', 'uploaded', 'trk011-3.mp3')},
-    }
-    app.dt_data = dt_data
+    # dt_data = {
+    #     'zniz': {'path': os.path.join(app.config.get('DATA_DIR'), 'dt_sessions', 'zniz')},
+    #     'zniz/uploaded': {'path': os.path.join(app.config.get('DATA_DIR'), 'dt_sessions', 'zniz', 'uploaded')},
+    #     'zniz/generated': {'path': os.path.join(app.config.get('DATA_DIR'), 'dt_sessions', 'zniz', 'generated')},
+    #     'zniz/uploaded/trk009-3.mp3': {'path': os.path.join(app.config.get('DATA_DIR'), 'dt_sessions', 'zniz', 'uploaded', 'trk009-3.mp3')},
+    #     'zniz/uploaded/trk010-3.mp3': {'path': os.path.join(app.config.get('DATA_DIR'), 'dt_sessions', 'zniz', 'uploaded', 'trk010-3.mp3')},
+    #     'zniz/uploaded/trk011-3.mp3': {'path': os.path.join(app.config.get('DATA_DIR'), 'dt_sessions', 'zniz', 'uploaded', 'trk011-3.mp3')},
+    # }
+    # app.dt_data = dt_data
+    
+    # dt_data_list = [
+    #     {'dt_item': 'zniz', 'dt_item_path': os.path.join(app.config.get('DATA_DIR'), 'dt_sessions', 'zniz')},
+    #     {'dt_item': 'zniz/uploaded', 'dt_item_path': os.path.join(app.config.get('DATA_DIR'), 'dt_sessions', 'zniz', 'uploaded')},
+    #     {'dt_item': 'zniz/generated', 'dt_item_path': os.path.join(app.config.get('DATA_DIR'), 'dt_sessions', 'zniz', 'generated')},
+    #     {'dt_item': 'zniz/uploaded/trk009-3.mp3', 'dt_item_path': os.path.join(app.config.get('DATA_DIR'), 'dt_sessions', 'zniz', 'uploaded', 'trk009-3.mp3')},
+    #     {'dt_item': 'zniz/uploaded/trk010-3.mp3', 'dt_item_path': os.path.join(app.config.get('DATA_DIR'), 'dt_sessions', 'zniz', 'uploaded', 'trk010-3.mp3')},
+    #     {'dt_item': 'zniz/uploaded/trk011-3.mp3', 'dt_item_path': os.path.join(app.config.get('DATA_DIR'), 'dt_sessions', 'zniz', 'uploaded', 'trk011-3.mp3')},
+    # ]
 
+    dt_data_list = walkdirlist(startpath='data/dt_sessions', absroot='/home/src/QK/droptrack/data/dt_sessions')
+    
+    app.dt_data_list = dt_data_list
 
 def create_app() -> Flask:
     """
