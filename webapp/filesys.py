@@ -1,3 +1,9 @@
+"""droptrack.filesys
+
+filesystem related stuff
+
+scan directory trees into list or dict of dictionaries
+"""
 import os 
 from pprint import pprint
 
@@ -19,6 +25,11 @@ def set_leaf(tree, branches, leaf):
     set_leaf(tree[branches[0]], branches[1:], leaf)
 
 def walkdir(startpath):
+    """walkdir
+
+    Walk the directory tree from startpath and return as nested dict
+    of dicts
+    """
     tree = {}
     for root, dirs, files in os.walk(startpath):
         branches = [startpath]
@@ -31,21 +42,33 @@ def walkdir(startpath):
     return tree
 
 def walkdirlist(startpath, absroot='./', verbose=False):
+    """walkdirlist
+
+    Walk the directory tree from startpath and return as flat list of
+    dicts. Each dict has at least a short handle and the full path to
+    the file, mapping handles to files.
+    """
     tree = []
+    # print(f'walking startpath {startpath}')
     # startpath basename
     for root, dirs, files in os.walk(startpath):
-        # print(f'walking root {root}, dirs {dirs}, files {files}')
+        if verbose:
+            print(f'walking root {root}, dirs {dirs}, files {files}')
         # if len(files) < 1:
         #     continue
-        for f in dirs + files:
+        for itempath in dirs + files:
             # if f == 'data':
             #     continue
-            filepath = os.path.join(root.replace('data/dt_sessions/', ''), f)
+            itemhandle = os.path.join(root.replace(startpath, ''), itempath)
+            if itemhandle.startswith('/'):
+                itemhandle = itemhandle[1:]
+            # itemhandle = itempath
             if verbose:
-                print(f'file {filepath}')
+                print(f'    itemhandle {itemhandle}')
             tree.append({
-                'dt_item': filepath,
-                'dt_item_path': os.path.join(absroot, filepath),
+                'dt_item': itemhandle,
+                # 'dt_item_path': os.path.join(absroot, startpath, filepath),
+                'dt_item_path': os.path.join(startpath, itemhandle),
             })
     return tree
 
@@ -56,7 +79,7 @@ if __name__ == '__main__':
     else:
         startpath = '.'
 
-    print(f'walking directory {startpath}')
+    print(f'filesys walking directory {startpath}')
 
     # tree = walkdir(startpath)
     tree = walkdirlist(startpath)

@@ -25,10 +25,10 @@ from .lib import (
 
 from multiprocessing import Process
 
-from .smp_audio_tasks import run_autoedit_2
+from .smp_audio_tasks import ns2kw, kw2ns
+from .smp_audio_tasks import run_autoedit_2, autoedit_conf_default
 
 api = Blueprint('api', __name__)
-
 
 def api_response_ok(data: dict) -> Response:
     data.update({'status': 'ok'})
@@ -45,8 +45,9 @@ def api_response_error(data: dict) -> Response:
     return jsonify(data)
 
 ############################################################
-# routes: api extensional version
-# exists: url, upload, download
+# api definition: all routes
+# file in/out: url, upload, download
+# file sys: item
 #
 # for autosuite
 # func(name, arg1, ..., argn)
@@ -69,83 +70,78 @@ def autoedit() -> Response:
 
     dummy function testing async
     """
-    dt_item = 'None'
+    dt_item = None
     if request.method == 'POST':
         request_data = request.form
         # request_data = request.files
     elif request.method == 'GET':
         request_data = request.args
 
-    # current_app.logger.info(f'request.files {request.files}')
-    current_app.logger.info(f'request.form {request.form}')
+    # current_app.logger.info(f'api.autoedit request.files {request.files}')
+    # current_app.logger.info(f'api.autoedit request.form {request.form}')
         
     if 'dt_item' in request_data:
         dt_item = request_data['dt_item']
-    elif 'dt_item' not in request_data and 'dt_session' in request_data:
-        dt_item = request_data['dt_session']
+    # elif 'dt_item' not in request_data and 'dt_session' in request_data:
+    #     # FIXME: this doesnt work
+    #     dt_item = request_data['dt_session']
     elif 'dt_item[]' in request_data:
         dt_item = request_data.getlist('dt_item[]')
-        # current_app.logger.info(f'dt_item {len(dt_item)}')
-        # for dt_item_i in request_data['dt_item[]']:
-        #     current_app.logger.info(f'dt_item_i {dt_item_i}')
-        #     dt_item = [_ for _ in request_data['dt_item[]']]
         
-    current_app.logger.info(f'dt_item type {type(dt_item)} data {dt_item}')
+    current_app.logger.info(f'api.autoedit dt_item type {type(dt_item)}')
+    current_app.logger.info(f'api.autoedit dt_item data {dt_item}')
 
-    # # do the work and get the item
-    # if dt_item in current_app.dt_data:
-    #     dt_item_path = current_app.dt_data[dt_item]['path']
-    #     current_app.logger.info(f'item dt_item[path] {dt_item_path}')
+    # check params
+    if dt_item is None:
+        return api_response_error({
+        'message': 'autoedit dt_item is None',
+    })
 
-    # do the work and get the item
-    # if dt_item_dict in current_app.dt_data_list:
-    
-    if type(dt_item) in [list]:
-        dt_item_dict = []
-        for dt_item_ in dt_item:
-            dt_item_dict += [_ for _ in current_app.dt_data_list if _['dt_item'] == dt_item_]
-    else:
-        dt_item_dict = [_ for _ in current_app.dt_data_list if _['dt_item'] == dt_item]
+    # convert single dt_item to list
+    if type(dt_item) not in [list]:
+        dt_item = [dt_item]
+
+    # # create argument list by mapping requested dt_items to existing
+    # # dt_items in dt_data_list
+    # dt_item_dict = [_ for _ in current_app.dt_data_list if _['dt_item'] in dt_item]
+    # current_app.logger.info(f'api.autoedit dt_item_dict {dt_item_dict}')
+
+    # create argument list with file paths only
+    # dt_item_path = [_['dt_item_path'] for _ in dt_item_dict]
+    # # this is nice but destroys the order of the input arguments
+    # dt_item_path = [_['dt_item_path'] for _ in current_app.dt_data_list if _['dt_item'] in dt_item]
+
+    # create file paths only list from dt_item
     dt_item_path = []
-    # if len(dt_item_dict) > 0:
-    for dt_item_dict_i in dt_item_dict:
-        dt_item_path.append(dt_item_dict_i['dt_item_path'])
-        
-    current_app.logger.info(f'item dt_item_path {dt_item_path}')
+    for dt_item_i in dt_item:
+        dt_item_path += [_['dt_item_path'] for _ in current_app.dt_data_list if _['dt_item'] == dt_item_i]
+    current_app.logger.info(f'api.autoedit dt_item_path {dt_item_path}')
 
-    # get function parameters / defaults
-    # for dt_params in ['dt_verbose', 'dt_assemble_mode', 'dt_duration',
-    #                   'dt_numsegs', 'dt_seed']:
+    # configure and run autoedit
+    autoedit_conf = kw2ns(autoedit_conf_default)
+    # current_app.logger.info(f'api.autoedit autoedit_conf_default {autoedit_conf}')
+    for k in autoedit_conf_default:
+        k_req = f'dt_{k}'
+        if k_req in request_data:
+            v_req = request_data[k_req]
+            setattr(autoedit_conf, k, v_req)
+            
+    # copy filename from request
+    autoedit_conf.filenames = dt_item_path
+    # autoedit_conf.rootdir = 'data/dt_sessions/zniz'
+    autoedit_conf.rootdir = current_app.dt_session_data_dir
     
-    dt_assemble_mode = 'random'
-    dt_numsegs = 60
-    dt_duration = 45
-    dt_seed = 1234
-    dt_verbose = False
-    
-    if 'dt_assemble_mode' in request_data:
-        dt_assemble_mode = request_data['dt_assemble_mode']
-    if 'dt_numsegs' in request_data:
-        dt_numsegs = request_data['dt_numsegs']
-    if 'dt_duration' in request_data:
-        dt_duration = request_data['dt_duration']
-    if 'dt_seed' in request_data:
-        dt_seed = request_data['dt_seed']
-    if 'dt_verbose' in request_data:
-        dt_verbose = request_data['dt_verbose']
+    current_app.logger.info(f'api.autoedit autoedit_conf {autoedit_conf}')
 
-    # Create a daemonic process with heavy "my_func"
+    # Create a process with "heavy" computation, anything taking more
+    # than a few seconds
     heavy_process = Process(  
-        # target=my_func,
-        target=run_autoedit_2,
+        target=run_autoedit_2, # my_func
+        # args=autoedit_conf,
         kwargs={
-            'filenames': dt_item_path,
-            'assemble_mode': dt_assemble_mode,
-            'numsegs': dt_numsegs,
-            'duration': dt_duration,
-            'seed': dt_seed,
-            'verbose': dt_verbose,
-            'rootdir': 'data/dt_sessions/zniz'
+            'autoedit_conf': autoedit_conf,
+            # 'filenames': dt_item_path,
+            # 'rootdir': 'data/dt_sessions/zniz'
         },
         daemon=True,
     )
@@ -167,7 +163,8 @@ def item() -> Response:
     """
     Accept soundfile url
     """
-    dt_item = 'None'
+    # default dt_item
+    dt_item = 'default'
     if request.method == 'POST':
         request_data = request.form
         # current_app.logger.info(f'item request.form {list(request.form.keys())}')
@@ -198,7 +195,7 @@ def item() -> Response:
     #         return api_response_error({'message': 'Invalid url'})
     # return Response(status=405)
 
-    current_app.logger.info(f'item requested dt_item {dt_item}')
+    current_app.logger.info(f'api.item requested dt_item {dt_item}')
 
     # # do the work and get the item
     # if dt_item in current_app.dt_data:
@@ -297,6 +294,9 @@ def upload() -> Response:
             # trigger player for redownload
             url = url_for('api.download', filename=filename, _external=True)
             current_app.queue.send(url)
+
+            # update app.dt_data
+            current_app.dt_data_list = walkdirlist(startpath='data/dt_sessions', absroot='/home/src/QK/droptrack/data/dt_sessions')
 
             # return response
             return api_response_ok({

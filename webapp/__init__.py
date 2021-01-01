@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import string, random
+from pprint import pformat
 import atexit
 from logging import Formatter
 from logging.handlers import SysLogHandler
@@ -15,7 +16,8 @@ from flask import (
 from .queue import Queue
 from .api import api
 from .filesys import walkdirlist
-# from .session import dtsession
+
+dt_session_default = 'zniz'
 
 ############################################################
 # data
@@ -33,8 +35,7 @@ def generate_username(length=4):
 
 def dt_session_dir_make(dt_session):
     dt_session_dir_path = os.path.join(
-        current_app.config['DATA_DIR'],
-        'dt_sessions',
+        current_app.dt_sessions_dir,
         dt_session
     )
 
@@ -133,9 +134,25 @@ def setup_data(app: Flask):
     #     {'dt_item': 'zniz/uploaded/trk011-3.mp3', 'dt_item_path': os.path.join(app.config.get('DATA_DIR'), 'dt_sessions', 'zniz', 'uploaded', 'trk011-3.mp3')},
     # ]
 
-    dt_data_list = walkdirlist(startpath='data/dt_sessions', absroot='/home/src/QK/droptrack/data/dt_sessions')
+    app.dt_sessions_dir = os.path.join(
+        app.config['DATA_DIR'],
+        'dt_sessions'
+    )
+
+    # session data dir at sessions data root plus current session name
+    app.dt_session_data_dir = os.path.join(
+        app.dt_sessions_dir,
+        dt_session_default
+    )
+    app.logger.info(f'app.dt_session_data_dir {pformat(app.dt_session_data_dir)}')
     
-    app.dt_data_list = dt_data_list
+    app.dt_data_list = walkdirlist(
+        # startpath=app.dt_session_data_dir,
+        startpath=app.dt_sessions_dir,
+        absroot=app.config.get('DATA_DIR'),
+        verbose=False
+    )
+    app.logger.info(f'app.dt_data_list {pformat(app.dt_data_list)}')
 
 def create_app() -> Flask:
     """
