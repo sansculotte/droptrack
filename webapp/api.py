@@ -90,7 +90,7 @@ def autoedit() -> Response:
         #     current_app.logger.info(f'dt_item_i {dt_item_i}')
         #     dt_item = [_ for _ in request_data['dt_item[]']]
         
-    current_app.logger.info(f'dt_item {type(dt_item)} {dt_item}')
+    current_app.logger.info(f'dt_item type {type(dt_item)} data {dt_item}')
 
     # # do the work and get the item
     # if dt_item in current_app.dt_data:
@@ -110,7 +110,29 @@ def autoedit() -> Response:
     # if len(dt_item_dict) > 0:
     for dt_item_dict_i in dt_item_dict:
         dt_item_path.append(dt_item_dict_i['dt_item_path'])
+        
     current_app.logger.info(f'item dt_item_path {dt_item_path}')
+
+    # get function parameters / defaults
+    # for dt_params in ['dt_verbose', 'dt_assemble_mode', 'dt_duration',
+    #                   'dt_numsegs', 'dt_seed']:
+    
+    dt_assemble_mode = 'random'
+    dt_numsegs = 60
+    dt_duration = 45
+    dt_seed = 1234
+    dt_verbose = False
+    
+    if 'dt_assemble_mode' in request_data:
+        dt_assemble_mode = request_data['dt_assemble_mode']
+    if 'dt_numsegs' in request_data:
+        dt_numsegs = request_data['dt_numsegs']
+    if 'dt_duration' in request_data:
+        dt_duration = request_data['dt_duration']
+    if 'dt_seed' in request_data:
+        dt_seed = request_data['dt_seed']
+    if 'dt_verbose' in request_data:
+        dt_verbose = request_data['dt_verbose']
 
     # Create a daemonic process with heavy "my_func"
     heavy_process = Process(  
@@ -118,14 +140,14 @@ def autoedit() -> Response:
         target=run_autoedit_2,
         kwargs={
             'filenames': dt_item_path,
-            'assemble_mode': 'random',
-            'numsegs': 60,
-            'duration': 45,
-            'seed': 1234,
-            'verbose': False,
+            'assemble_mode': dt_assemble_mode,
+            'numsegs': dt_numsegs,
+            'duration': dt_duration,
+            'seed': dt_seed,
+            'verbose': dt_verbose,
             'rootdir': 'data/dt_sessions/zniz'
         },
-        daemon=False,
+        daemon=True,
     )
     heavy_process.start()
     return api_response_started({
