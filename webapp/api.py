@@ -314,3 +314,35 @@ def download(filename: str) -> Response:
         filename,
         as_attachment=True
     )
+
+@api.route('/download', methods=['GET', 'POST'])
+def download_dt_item() -> Response:
+    if request.method == 'POST':
+        request_data = request.form
+    elif request.method == 'GET':
+        request_data = request.args
+
+    if 'dt_item' in request_data:
+        dt_item = request_data['dt_item']
+    current_app.logger.info(f'api.download dt_item {dt_item}')
+
+    # # nice idea, but cant return in for loop
+    # # convert single dt_item to list
+    # if type(dt_item) not in [list]:
+    #     dt_item = [dt_item]
+
+    # # create file paths only list from dt_item
+    # dt_item_path = []
+    # for dt_item_i in dt_item:
+    #     dt_item_path += [_['dt_item_path'] for _ in current_app.dt_data_list if _['dt_item'] == dt_item_i]
+    #        current_app.logger.info(f'api.autoedit dt_item_path {dt_item_path}')
+
+    # # for path in dt_item_path:
+
+    dt_item_path = [_['dt_item_path'] for _ in current_app.dt_data_list if _['dt_item'] == dt_item][-1]
+    current_app.logger.info(f'api.download dt_item_path {dt_item_path}')
+    return send_from_directory(
+        os.path.dirname(dt_item_path),
+        os.path.basename(dt_item_path),
+        as_attachment=True
+    )
