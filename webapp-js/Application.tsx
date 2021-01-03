@@ -50,7 +50,7 @@ class Application extends React.Component<Props, State> {
   }
 
   handleDropFile(files: Array<any>) {
-    const results = files.map(f => http.upload('/upload', f, 'soundfile'))
+    const results = files.map(f => http.upload('/files', f, 'soundfile'))
     if (results.length > 0) {
       results[0].then((response: ApiResponse) => {
         const { message } = response
