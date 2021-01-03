@@ -7,6 +7,6 @@
     <body>
         <section id="application-root">
         </section>
-        <script src="/static/scripts/main.bundle.js?v={{ range(1000, 9999) | random }}"></script>
+        <script src="{{ config.BASE_PATH or '' }}/static/scripts/main.bundle.js?v={{ range(1000, 9999) | random }}"></script>
     </body>
 </html>

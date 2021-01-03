@@ -19,6 +19,8 @@ interface State {
     dt_items: Array<any>
 }
 
+const API_URL = 'http://127.0.0.1:5000'
+
 class Application extends React.Component<Props, State> {
 
   constructor(props: Props) {
@@ -29,7 +31,6 @@ class Application extends React.Component<Props, State> {
 	url: '',
 	dt_item: '',
 	dt_items: [],
-	// apiURL: 'http://127.0.0.1:5000/item?dt_item=zniz',
     }
 
       // fetch data
@@ -84,9 +85,8 @@ class Application extends React.Component<Props, State> {
   }
 
     fetchData = async () => {
-	const apiURL = 'http://127.0.0.1:5000/item?dt_item=zniz'
-	console.log('fetching ' + apiURL)
-    	fetch(apiURL)
+	console.log('fetching ' + API_URL)
+    	fetch(API_URL + '/item?dt_item=zniz')
     	    .then(res => res.json())
     	    .then(
     		(result) => {
@@ -113,9 +113,9 @@ class Application extends React.Component<Props, State> {
     }
     
     // fetchData = async () => {
-    //     // const response = await axios.get(apiURL)
+    //     // const response = await axios.get(API_URL)
 
-    // 	fetch(this.apiURL)
+    // 	fetch(this.API_URL)
     // 	    .then(res => res.json())
     // 	    .then(
     // 		(result) => {
