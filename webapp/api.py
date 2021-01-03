@@ -6,10 +6,12 @@ This is NOT proper REST.
 """
 
 
+from typing import Optional
 import os
 from flask import (
+    g,
     current_app,
-    jsonify,
+    json,
     request,
     url_for,
     session,
@@ -22,6 +24,10 @@ from .lib import (
     validate_url,
     validate_soundfile,
 )
+from .models import User
+"""
+The main mechanics of the webapp.
+"""
 
 from .filesys import walkdirlist
 
@@ -32,9 +38,26 @@ from .smp_audio_tasks import run_autoedit_2, autoedit_conf_default
 
 api = Blueprint('api', __name__)
 
-def api_response_ok(data: dict) -> Response:
+@api.before_request
+def authenticate() -> Optional[Response]:
+    """
+    verify token, bind user to request global
+    """
+    token = request.headers.get('X-Authentication')
+    if token:
+        g.user = User.verify_api_token(token)
+        return None
+    else:
+        return not_authorized()
+
+
+def not_authorized(error=None, message='not authorized') -> Response:
+    return api_response_error({'message': message}, status=403)
+
+
+def api_response_ok(data: dict, status: int = 200) -> Response:
     data.update({'status': 'ok'})
-    return jsonify(data)
+    return Response(json.dumps(data), status=status)
 
 
 def api_response_started(data: dict) -> Response:
@@ -42,9 +65,9 @@ def api_response_started(data: dict) -> Response:
     return jsonify(data)
 
 
-def api_response_error(data: dict) -> Response:
+def api_response_error(data: dict, status: int = 400) -> Response:
     data.update({'status': 'error'})
-    return jsonify(data)
+    return Response(json.dumps(data), status=status)
 
 ############################################################
 # api definition: all routes
@@ -255,7 +278,7 @@ def url() -> Response:
             return api_response_error({'message': 'Invalid url'})
     return Response(status=405)
 
-@api.route('/upload', methods=['POST'])
+@api.route('/files', methods=['POST'])
 def upload() -> Response:
     """
     Accept direct soundfile upload per multipart/form-data
@@ -285,8 +308,16 @@ def upload() -> Response:
             
         if soundfile and validate_soundfile(soundfile):
             filename = secure_filename(soundfile.filename)
+
+            # make sure home directory exists.
+            if not os.path.exists(g.user.home_directory):
+                g.user.make_home_directory()
+                current_app.logger.info(
+                    f'User Home directory created {g.user.home_directory}'
+                )
+
             location = os.path.join(
-                upload_dir,
+                g.user.home_directory,
                 filename
             )
             soundfile.save(location)
@@ -311,42 +342,26 @@ def upload() -> Response:
             return api_response_error({'message': 'Invalid File'})
     return Response(status=405)
 
-@api.route('/download/<string:filename>')
+
+@api.route('/files/<string:filename>', methods=['GET'])
 def download(filename: str) -> Response:
+    """
+    Retrieve stored file
+    """
     return send_from_directory(
-        current_app.config['UPLOAD_DIR'],
+        g.user.home_directory,
         filename,
         as_attachment=True
     )
 
-@api.route('/download', methods=['GET', 'POST'])
-def download_dt_item() -> Response:
-    if request.method == 'POST':
-        request_data = request.form
-    elif request.method == 'GET':
-        request_data = request.args
-
-    if 'dt_item' in request_data:
-        dt_item = request_data['dt_item']
-    current_app.logger.info(f'api.download dt_item {dt_item}')
-
-    # # nice idea, but cant return in for loop
-    # # convert single dt_item to list
-    # if type(dt_item) not in [list]:
-    #     dt_item = [dt_item]
-
-    # # create file paths only list from dt_item
-    # dt_item_path = []
-    # for dt_item_i in dt_item:
-    #     dt_item_path += [_['dt_item_path'] for _ in current_app.dt_data_list if _['dt_item'] == dt_item_i]
-    #        current_app.logger.info(f'api.autoedit dt_item_path {dt_item_path}')
-
-    # # for path in dt_item_path:
-
-    dt_item_path = [_['dt_item_path'] for _ in current_app.dt_data_list if _['dt_item'] == dt_item][-1]
-    current_app.logger.info(f'api.download dt_item_path {dt_item_path}')
-    return send_from_directory(
-        os.path.dirname(dt_item_path),
-        os.path.basename(dt_item_path),
-        as_attachment=True
+@api.route('/files/<string:filename>', methods=['DELETE'])
+def delete_file(filename: str) -> Response:
+    """
+    Delete stored file
+    """
+    location = os.path.join(
+        g.user.home_directory,
+        filename
     )
+    os.unlink(location)
+    return api_response_ok({'message': 'file deleted'})

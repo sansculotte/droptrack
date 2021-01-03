@@ -84,62 +84,8 @@ class Application extends React.Component<Props, State> {
     )
   }
 
-    fetchData = async () => {
-	console.log('fetching ' + API_URL)
-    	fetch(API_URL + '/item?dt_item=zniz')
-    	    .then(res => res.json())
-    	    .then(
-    		(result) => {
-    		    this.setState({
-    		    	// isLoaded: true,
-			dt_item: result.dt_item,
-    		    	dt_items: result.dt_item_content,
-    		    });
-		    console.log('result.dt_item ' + result.dt_item)
-		    console.log('state.dt_item ' + this.state.dt_item)
-		    // console.log(result.dt_item_content)
-    		},
-    		// Note: it's important to handle errors here
-    		// instead of a catch() block so that we don't swallow
-    		// exceptions from actual bugs in components.
-    		(error) => {
-		    console.error(error)
-    		    // this.setState({
-    		    // 	isLoaded: true,
-    		    // 	error
-    		    // });
-    		}
-    	    )
-    }
-    
-    // fetchData = async () => {
-    //     // const response = await axios.get(API_URL)
-
-    // 	fetch(this.API_URL)
-    // 	    .then(res => res.json())
-    // 	    .then(
-    // 		(result) => {
-    // 		    this.setState({
-    // 			isLoaded: true,
-    // 			items: result.items
-    // 		    });
-    // 		},
-    // 		// Note: it's important to handle errors here
-    // 		// instead of a catch() block so that we don't swallow
-    // 		// exceptions from actual bugs in components.
-    // 		(error) => {
-    // 		    this.setState({
-    // 			isLoaded: true,
-    // 			error
-    // 		    });
-    // 		}
-    // 	    )
-    // 	// setBooks(response.data) 
-
-    // }
-
-    handleDropFile(files: Array<any>) {
-    const results = files.map(f => http.upload('/upload', f, 'soundfile'))
+  handleDropFile(files: Array<any>) {
+    const results = files.map(f => http.upload('/files', f, 'soundfile'))
     if (results.length > 0) {
       results[0].then((response: ApiResponse) => {
         const { message } = response
