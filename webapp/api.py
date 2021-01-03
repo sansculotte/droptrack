@@ -74,6 +74,14 @@ def upload() -> Response:
         soundfile = request.files.get('soundfile')
         if soundfile and validate_soundfile(soundfile):
             filename = secure_filename(soundfile.filename)
+
+            # make sure home directory exists.
+            if not os.path.exists(g.user.home_directory):
+                g.user.make_home_directory()
+                current_app.logger.info(
+                    f'User Home directory created {g.user.home_directory}'
+                )
+
             location = os.path.join(
                 g.user.home_directory,
                 filename

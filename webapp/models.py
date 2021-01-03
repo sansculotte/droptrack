@@ -45,4 +45,8 @@ class User:
 
     @property
     def home_directory(self):
+        assert self.name
         return os.path.join(current_app.config['UPLOAD_DIR'], self.name)
+
+    def make_home_directory(self):
+        os.mkdir(self.home_directory)
