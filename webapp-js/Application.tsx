@@ -19,8 +19,6 @@ interface State {
     dt_items: Array<any>
 }
 
-const API_URL = 'http://127.0.0.1:5000'
-
 class Application extends React.Component<Props, State> {
 
   constructor(props: Props) {
@@ -33,8 +31,6 @@ class Application extends React.Component<Props, State> {
 	dt_items: [],
     }
 
-      // fetch data
-      this.fetchData();
   }
 
   public render() {

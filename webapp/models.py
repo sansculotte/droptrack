@@ -4,7 +4,7 @@ from flask import current_app
 from dataclasses import dataclass
 
 
-__users = [
+_users = [
     {
         'id': 1,
         'name': 'x',
@@ -38,7 +38,7 @@ class User:
     @staticmethod
     def verify_api_token(token: str) -> Optional['User']:
         if token:
-            for user in __users:
+            for user in _users:
                 if user['api_token'] == token:
                     return User(**user)
         return None
