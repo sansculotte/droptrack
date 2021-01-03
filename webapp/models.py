@@ -4,7 +4,7 @@ from flask import current_app
 from dataclasses import dataclass
 
 
-users = [
+__users = [
     {
         'id': 1,
         'name': 'x',
@@ -24,7 +24,7 @@ class Token:
     def __str__(self):
         return self.__token
 
-    def __eq__(self, other: Union[str, 'Token']):
+    def __eq__(self, other: object):
         return str(self) == other
 
 
@@ -33,12 +33,12 @@ class User:
 
     id: int
     name: str
-    api_token: Token
+    api_token: str
 
     @staticmethod
     def verify_api_token(token: str) -> Optional['User']:
         if token:
-            for user in users:
+            for user in __users:
                 if user['api_token'] == token:
                     return User(**user)
         return None

@@ -95,7 +95,7 @@ def upload() -> Response:
     return Response(status=405)
 
 
-@api.route('/files/<string:filename>')
+@api.route('/files/<string:filename>', methods=['GET'])
 def download(filename: str) -> Response:
     """
     Retrieve stored file
@@ -105,3 +105,16 @@ def download(filename: str) -> Response:
         filename,
         as_attachment=True
     )
+
+
+@api.route('/files/<string:filename>', methods=['DELETE'])
+def delete_file(filename: str) -> Response:
+    """
+    Delete stored file
+    """
+    location = os.path.join(
+        g.user.home_directory,
+        filename
+    )
+    os.unlink(location)
+    return api_response_ok({'message': 'file deleted'})
