@@ -56,30 +56,6 @@ class Application extends React.Component<Props, State> {
           <FileDrop accept="audio/*" onDrop={this.handleDropFile.bind(this)} />
         </form>
 	    
-	<div>
-	    <h1>droptrack items</h1>
-	    <h2>fetch a list from the API and display it</h2>
-
-	    { /* file browser, fetch data and list */ }
-	
-	    <div>
-                <button className="fetch-button" onClick={this.fetchData}>
-                Fetch Data
-                </button>
-	    </div>
-
-	    <div>
-	        {this.state.dt_item && <h3>dt_item {this.state.dt_item}</h3>}
-	        {Object.keys(this.state.dt_items).length>0 && <p>dt_items length {Object.keys(this.state.dt_items).length}</p>}
-	        {
-		    Object.keys(this.state.dt_items).length>0 &&
-			this.state.dt_items.map(item => (
-			    <p>{item.dt_item} {item.dt_item_path}</p>
-			))
-		}
-	    </div>
-
-	</div>
       </main>
     )
   }
