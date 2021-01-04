@@ -1,0 +1,31 @@
+{{ log_dir }}/access.log {
+    weekly
+    rotate 16
+    compress
+    delaycompress
+    su {{ www_user }}
+}
+
+{{ log_dir }}/error.log {
+    weekly
+    rotate 16
+    compress
+    delaycompress
+    su {{ www_user }}
+}
+
+{{ log_dir }}/uwsgi.log {
+    weekly
+    rotate 16
+    compress
+    delaycompress
+    su {{ www_user }}
+}
+
+{{ log_dir }}/app.log {
+    weekly
+    rotate 16
+    compress
+    delaycompress
+    su {{ www_user }}
+}

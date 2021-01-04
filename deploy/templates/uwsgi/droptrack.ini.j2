@@ -1,0 +1,19 @@
+[uwsgi]
+uid = www 
+gid = www 
+
+base = {{ app_dir }}
+logto = {{ log_dir }}/uwsgi.log
+
+env = APP_ENV=config.{{ app_env }}Config
+env = SECRETS={{ app_config_dir }}/secrets
+
+venv = %(base)/venv
+chdir = %(base)
+module = app:create_app()
+
+socket = {{ uwsgi_socket }}
+
+# monitoring
+stats = 127.0.0.1:1717
+memory_report = true
