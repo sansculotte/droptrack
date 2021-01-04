@@ -126,12 +126,12 @@ def download(filename: str) -> Response:
     """
     current_app.logger.info(f'api.download filename {filename}')
     current_app.logger.info(f'api.download g.user.home_directory {g.user.home_directory}')
-    return api_response_ok({'message': 'api.download'})
-    # return send_from_directory(
-    #     g.user.home_directory,
-    #     filename,
-    #     as_attachment=True
-    # )
+    # return api_response_ok({'message': 'api.download'})
+    return send_from_directory(
+        g.user.home_directory,
+        filename,
+        as_attachment=True
+    )
     
 
 @api.route('/files/<string:filename>', methods=['DELETE'])
