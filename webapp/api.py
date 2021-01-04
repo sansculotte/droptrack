@@ -103,6 +103,7 @@ def upload() -> Response:
                 filename
             )
             soundfile.save(location)
+            soundfilesize = os.path.getsize(location)
             
             # trigger player for redownload
             url = url_for('api.download', filename=filename, _external=True)
