@@ -41,8 +41,16 @@ Install python dependencies
     ./run_player.sh
 
 
-API
----
+API v2
+------
+
+for development
+
+`export API_URL=http://127.0.0.1:5000`
+
+for deploy
+
+
 
 uploading file with curl
 

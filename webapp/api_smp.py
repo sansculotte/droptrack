@@ -120,31 +120,31 @@ def my_func(**kwargs):
     time.sleep(3)
     current_app.logger.info("my_func Process finished")
 
-# get directory listings
-@api_smp.route('/files/<string:filename>', methods=['GET'])
-def download(filename: str) -> Response:
-    """
-    Retrieve stored file
-    """
-    current_app.logger.info(f'download filename {filename}')
-    filepath = os.path.join(
-        g.user.home_directory,
-        filename
-    )
-    if os.path.isdir(filepath):
-        # return dir listing
-        dirlist = [{
-            'filepath': os.path.join(filepath, _)} for _ in os.listdir(filepath)]
-        return api_response_ok({
-            'message': 'directory',
-            'dirlist': dirlist,
-        })
-    elif os.path.isfile(filepath):
-        return send_from_directory(
-            g.user.home_directory,
-            filename,
-            as_attachment=True
-        )
+# # get directory listings
+# @api_smp.route('/files/<string:filename>', methods=['GET'])
+# def download(filename: str) -> Response:
+#     """
+#     Retrieve stored file
+#     """
+#     current_app.logger.info(f'download filename {filename}')
+#     filepath = os.path.join(
+#         g.user.home_directory,
+#         filename
+#     )
+#     if os.path.isdir(filepath):
+#         # return dir listing
+#         dirlist = [{
+#             'filepath': os.path.join(filepath, _)} for _ in os.listdir(filepath)]
+#         return api_response_ok({
+#             'message': 'directory',
+#             'dirlist': dirlist,
+#         })
+#     elif os.path.isfile(filepath):
+#         return send_from_directory(
+#             g.user.home_directory,
+#             filename,
+#             as_attachment=True
+#         )
 
 
 @api_smp.route('/item', methods=['GET', 'POST'])
