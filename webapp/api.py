@@ -119,14 +119,11 @@ def upload() -> Response:
     return Response(status=405)
 
 
-@api.route('/files/<string:filename>', methods=['GET'])
+@api.route('/files/<path:filename>', methods=['GET'])
 def download(filename: str) -> Response:
     """
     Retrieve stored file
     """
-    current_app.logger.info(f'api.download filename {filename}')
-    current_app.logger.info(f'api.download g.user.home_directory {g.user.home_directory}')
-    # return api_response_ok({'message': 'api.download'})
     return send_from_directory(
         g.user.home_directory,
         filename,
