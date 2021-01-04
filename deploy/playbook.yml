@@ -1,0 +1,103 @@
+---
+# Set up a droptrack server 
+
+- hosts: droptrack
+  remote_user: deploy
+  become: yes
+  become_method: sudo
+
+  vars:
+    server_name: drop.sansculotte.net 
+    install_dir: /opt/droptrack
+    app_dir: /opt/droptrack/current
+    app_config_dir: /opt/droptrack/config
+    app_env: Production
+    log_dir: /opt/droptrack/logs
+    upload_dir: /opt/droptrack/upload
+    data_dir: /opt/droptrack/data
+    cert_dir: /usr/local/etc/nginx/ssl
+    uwsgi_socket: /run/uwsgi/app/droptrack/socket
+    www_user: www
+
+  tasks:
+   - name: Create install directory
+     file: path={{ install_dir }} state=directory owner=deploy group=deploy mode=0775
+   - name: Create log directory
+     file: path={{ log_dir }} state=directory owner={{ www_user }} group=deploy mode=0775
+   - name: Create app socket directory
+     file: path=/run/uwsgi/app/droptrack state=directory owner={{ www_user }}
+
+   - name: Install tools
+     pkgng:
+         name: htop, bash, logrotate
+         state: present
+
+   - name: Ensure python3.7 is present
+     pkgng:
+         name: python37, py37-virtualenv py37-pip
+         state: present
+
+   - name: Configure syslog
+     template: src=templates/syslog/40-droptrack.conf.j2 dest=/etc/syslog.d/40-droptrack.conf
+
+   - name: Configure logrotate
+     template: src=templates/logrotate/droptrack.j2 dest=/usr/local/etc/logrotate.d/droptrack
+
+   # dependencies
+   - name: Ensure libzmq is installed
+     pkgng:
+         name: libzmq4
+
+   # app-server
+   - name: Ensure uwsgi is present
+     pkgng:
+         name: uwsgi
+
+   - name: Create uwsgi config dir
+     file: path=/etc/uwsgi/apps-enabled state=directory
+
+   - name: Configure uwsgi
+     template: src=templates/uwsgi/droptrack.ini.j2 dest=/usr/local/etc/uwsgi/droptrack.ini
+
+   # webserver
+   - name: Ensure nginx is present
+     pkgng:
+         name: nginx
+         state: present
+
+   - name: Create nginx directory
+     file: path=/usr/local/etc/nginx/sites-enabled state=directory
+
+   - name: Configure nginx
+     copy: src=templates/nginx/nginx.conf dest=/usr/local/etc/nginx/nginx.conf owner=root group=wheel mode=644
+   - name: Configure sites
+     template: src=templates/nginx/{{ server_name }}.conf.j2 dest=/usr/local/etc/nginx/sites-enabled/{{ server_name }}.conf
+
+   # upload certificates
+   #- name: Create certificate directory
+   #  file: path={{ cert_dir }} state=directory owner=root mode=0755
+   #- name: Upload certificates
+   #  copy: src=files/ssl/{{ item }} dest={{ cert_dir }}/{{ item }} owner=deploy group={{ www_user }} mode=755
+   #  with_items:
+   #      - wildcard.droptrack.net.chained.crt
+   #      - wildcard.droptrack.net.pem
+
+   # local config
+   - name: Create config directory
+     file: path={{ app_config_dir }} state=directory owner={{ www_user }} group=deploy mode=0770
+   - name: Upload Secrets
+     copy: src=files/{{ item }} dest={{ app_config_dir }}/{{ item }} owner={{ www_user }} group=deploy mode=660
+     with_items:
+         - secrets
+
+   - name: Create upload directory
+     file: path={{ upload_dir }} state=directory owner={{ www_user }} group=deploy mode=0770
+   
+   - name: Create data directory
+     file: path={{ data_dir }} state=directory owner={{ www_user }} group=deploy mode=0770
+
+   - name: Start uwsgi
+     service: name=uwsgi state=started enabled=yes
+
+   - name: Start nginx
+     service: name=nginx state=started enabled=yes

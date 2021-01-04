@@ -39,3 +39,13 @@ Install python dependencies
 *Player*
 
     ./run_player.sh
+
+
+Deploy
+------
+
+Directory deploy has an ansible playbook and configuration templates to provision a
+droptrack server.
+https://docs.ansible.com/ansible/latest/user_guide/playbooks.html
+
+Use fabric to deploy new iterations.
