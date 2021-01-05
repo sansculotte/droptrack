@@ -10,7 +10,7 @@ interface Props {
   accept: string
 }
 
-const FileDrop = (props: Props) => {
+export default (props: Props) => {
   const onDrop = useCallback(props.onDrop, [])
   const {
     getRootProps,
@@ -29,5 +29,3 @@ const FileDrop = (props: Props) => {
     </div>
   )
 }
-
-export default FileDrop

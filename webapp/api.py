@@ -65,7 +65,7 @@ def url() -> Response:
     return Response(status=405)
 
 
-@api.route('/files', methods=['POST'])
+@api.route('/files', methods=['POST', 'GET'])
 def upload() -> Response:
     """
     Accept direct soundfile upload per multipart/form-data
@@ -92,10 +92,16 @@ def upload() -> Response:
             return api_response_ok({'message': 'File accepted'})
         else:
             return api_response_error({'message': 'Invalid File'})
+
+    if request.method == 'GET':
+        files = os.listdir(g.user.home_directory)
+        visible_files = [f for f in files if not f.startswith('.')]
+        return api_response_ok({'files': visible_files})
+
     return Response(status=405)
 
 
-@api.route('/files/<string:filename>', methods=['GET'])
+@api.route('/files/<path:filename>', methods=['GET'])
 def download(filename: str) -> Response:
     """
     Retrieve stored file
@@ -107,7 +113,7 @@ def download(filename: str) -> Response:
     )
 
 
-@api.route('/files/<string:filename>', methods=['DELETE'])
+@api.route('/files/<path:filename>', methods=['DELETE'])
 def delete_file(filename: str) -> Response:
     """
     Delete stored file
