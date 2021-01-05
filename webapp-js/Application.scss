@@ -19,10 +19,6 @@ main.app {
     }
     input[type="button"] {
       grid-column: 2 / span 1;
-      background-color: #990000;
-      color: white;
-      border: none;
-      font-weight: 600;
     }
     input[type="number"] {
       width: 100%;
@@ -35,6 +31,13 @@ main.app {
       box-sizing: border-box;
       border: 2px solid silver;
     }
+  }
+  button, input[type="button"] {
+    background-color: #990000;
+    color: white;
+    border: none;
+    font-weight: 600;
+    padding: 4px 4px 4px 4px;
   }
 }
 
