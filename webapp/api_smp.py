@@ -22,6 +22,7 @@ from multiprocessing import Process
 
 from .smp_audio_tasks import ns2kw, kw2ns
 from .smp_audio_tasks import run_autoedit_2, autoedit_conf_default
+from .smp_audio_tasks import main_autocover, autocover_conf_default
 
 from .api import authenticate, not_authorized
 from .api import api_response_ok, api_response_started, api_response_error
@@ -111,6 +112,65 @@ def autoedit() -> Response:
         res = autoedit_GET()
     elif request.method == 'POST':
         res = autoedit_POST()
+    return res
+
+def autocover_GET():
+    return api_response_ok({
+        'message': 'autocover help',
+        'autocover': {
+            'default': autocover_conf_default,
+        }
+    })
+
+def autocover_POST():
+    # configure and run autocover
+    autocover_conf = kw2ns(autocover_conf_default)
+    current_app.logger.info(f'api_smp.autocover_POST autocover_conf_default {autocover_conf}')
+
+    request_data = request.json
+    for k in autocover_conf_default:
+        k_req = f'{k}'
+        if k_req in request_data:
+            v_req = request_data[k_req]
+            setattr(autocover_conf, k, v_req)
+
+    autocover_conf.filenames = [os.path.join(g.user.home_directory, filename) for filename in autocover_conf.filenames]
+            
+    current_app.logger.info(f'api_smp.autocover_POST autocover_conf_request {autocover_conf}')
+    
+    # Create a process with "heavy" computation
+    # anything taking more than a few seconds
+    # heavy_process = Process(
+    #     target=main_autocover, # my_func
+    #     args=[autocover_conf],
+    #     # kwargs={
+    #     #     'autocover_conf': autocover_conf,
+    #     # },
+    #     daemon=True,
+    # )
+    # heavy_process.start()
+    # return api_response_started({
+    #     'message': 'autocover started',
+    # })
+
+    res = main_autocover(autocover_conf)
+    return api_response_ok({
+        'message': 'autocover result',
+        'autocover/res': res,
+    })
+
+@api_smp.route('/autocover', methods=['GET', 'POST'])
+def autocover() -> Response:
+    """autocover
+
+    Run autocover from request data
+    - GET: return help / default conf
+    - POST: run autocover with request conf
+    """
+    if request.method == 'GET':
+        res = autocover_GET()
+    elif request.method == 'POST':
+        res = autocover_POST()
     return res
 
 # async testing, define some heavy function

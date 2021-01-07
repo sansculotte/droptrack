@@ -35,6 +35,7 @@ def setup_routes(app: Flask):
     app.add_url_rule('/', 'root', root)
     app.register_blueprint(api)
     app.register_blueprint(api_smp, url_prefix='/api/smp')
+    # app.register_blueprint(api_smp)
 
 
 def setup_queue(app: Flask):

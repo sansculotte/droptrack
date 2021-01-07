@@ -3,6 +3,9 @@ from smp_audio.util import kw2ns, ns2kw
 from smp_audio.autoedit import autoedit_conf_default
 from smp_audio.autoedit import main_autoedit
 
+from smp_audio.autocover import autocover_conf_default
+from smp_audio.autocover import main_autocover
+
 def run_autoedit_2(*args, **kwargs):
     # print(f'run_autoedit args_ns {args_ns}')
 

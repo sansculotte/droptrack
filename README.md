@@ -50,7 +50,7 @@ for development
 
 for deploy
 
-
+`export API_URL=https://soup.jetpack.cl/droptrack`
 
 uploading file with curl
 
@@ -60,10 +60,24 @@ downloading file with curl
 
 `curl -H "X-Authentication: yuOJX-8paOqRJR8iefr7vL-Ozu5owbSUtr8SIM0K1L1EKPB9mWjPM52nydMEFyl7" http://127.0.0.1:5000/files/trk013-4.mp3`
 
-calling autoedit with single file input with
+calling GET /autoedit to get help on the command in the JSON return
+
+`curl -H "X-Authentication: yuOJX-8paOqRJR8iefr7vL-Ozu5owbSUtr8SIM0K1L1EKPB9mWjPM52nydMEFyl7" -H "Content-Type: application/json" -X GET http://127.0.0.1:5000/api/smp/autoedit`
+
+calling POST autoedit with single file input with
 
 `curl -H "X-Authentication: yuOJX-8paOqRJR8iefr7vL-Ozu5owbSUtr8SIM0K1L1EKPB9mWjPM52nydMEFyl7" -H "Content-Type: application/json" -X POST --data '{"filenames": ["trk013-4.mp3"]}' http://127.0.0.1:5000/api/smp/autoedit`
+
 
 downloading result file with curl
 
 `curl -H "X-Authentication: yuOJX-8paOqRJR8iefr7vL-Ozu5owbSUtr8SIM0K1L1EKPB9mWjPM52nydMEFyl7" http://127.0.0.1:5000/files/data/trk013-4-autoedit-0.wav`
+
+
+calling GET /autocover to get help on the command in the JSON return
+
+`curl -H "X-Authentication: yuOJX-8paOqRJR8iefr7vL-Ozu5owbSUtr8SIM0K1L1EKPB9mWjPM52nydMEFyl7" -H "Content-Type: application/json" -X GET http://127.0.0.1:5000/api/smp/autocover`
+
+calling POST /autocover with a single file input and optional `"autocover_mode": {"feature_matrix", "recurrence_matrix"}` selector
+
+`curl -H "X-Authentication: yuOJX-8paOqRJR8iefr7vL-Ozu5owbSUtr8SIM0K1L1EKPB9mWjPM52nydMEFyl7" -H "Content-Type: application/json" -X POST --data '{"filenames": ["trk013-4.mp3"]}' http://127.0.0.1:5000/api/smp/autocover`
