@@ -52,11 +52,17 @@ for deploy
 
 `export API_URL=https://soup.jetpack.cl/droptrack`
 
-uploading file with curl
+uploading file with curl, /files POST
 
 `curl -H "X-Authentication: yuOJX-8paOqRJR8iefr7vL-Ozu5owbSUtr8SIM0K1L1EKPB9mWjPM52nydMEFyl7" -F "soundfile=@\"./mp3/trk009-3.mp3\"" http://127.0.0.1:5000/files`
 
-downloading file with curl
+downloading directory listing, /files GET
+
+`curl -H "X-Authentication: yuOJX-8paOqRJR8iefr7vL-Ozu5owbSUtr8SIM0K1L1EKPB9mWjPM52nydMEFyl7" http://127.0.0.1:5000/files`
+
+this returns the full tree, there is no listing of sub-directories
+
+downloading file with curl, /files/file GET
 
 `curl -H "X-Authentication: yuOJX-8paOqRJR8iefr7vL-Ozu5owbSUtr8SIM0K1L1EKPB9mWjPM52nydMEFyl7" http://127.0.0.1:5000/files/trk013-4.mp3`
 

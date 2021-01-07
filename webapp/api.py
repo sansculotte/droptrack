@@ -26,6 +26,7 @@ from .lib import (
     validate_soundfile,
 )
 from .models import User
+from .filesys import walkdirlist
 """
 The main mechanics of the webapp.
 """
@@ -80,11 +81,7 @@ def url() -> Response:
     return Response(status=405)
 
 
-@api.route('/files', methods=['POST'])
-def upload() -> Response:
-    """
-    Accept direct soundfile upload per multipart/form-data
-    """
+def upload_POST():
     if request.method == 'POST':
         soundfile = request.files.get('soundfile')
             
@@ -118,12 +115,35 @@ def upload() -> Response:
             return api_response_error({'message': 'Invalid File'})
     return Response(status=405)
 
+def upload_GET():
+    files = walkdirlist(
+        # startpath=app.dt_session_data_dir,
+        startpath=g.user.home_directory,
+        verbose=False
+    )
+
+    return api_response_ok({
+        'message': 'upload_GET',
+        'files': files,
+    })
+
+@api.route('/files', methods=['GET', 'POST'])
+def upload() -> Response:
+    """
+    Accept direct soundfile upload per multipart/form-data
+    """
+    if request.method == 'POST':
+        return upload_POST()
+    elif request.method == 'GET':
+        return upload_GET()
+
 
 @api.route('/files/<path:filename>', methods=['GET'])
 def download(filename: str) -> Response:
     """
     Retrieve stored file
     """
+    current_app.logger.info(f"download {filename}")
     return send_from_directory(
         g.user.home_directory,
         filename,

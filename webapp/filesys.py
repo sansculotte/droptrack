@@ -65,10 +65,17 @@ def walkdirlist(startpath, absroot='./', verbose=False):
             # itemhandle = itempath
             if verbose:
                 print(f'    itemhandle {itemhandle}')
+            itempath = os.path.join(startpath, itemhandle)
+            if os.path.isdir(itempath):
+                itemtype = 'd'
+            elif os.path.isfile(itempath):
+                itemtype = 'f'
             tree.append({
-                'dt_item': itemhandle,
+                # TODO: map filesys.h struct
+                'handle': itemhandle,
+                'path': itempath,
+                'type': itemtype,
                 # 'dt_item_path': os.path.join(absroot, startpath, filepath),
-                'dt_item_path': os.path.join(startpath, itemhandle),
             })
     return tree
 
