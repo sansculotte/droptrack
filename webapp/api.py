@@ -11,7 +11,7 @@ from flask import (
     Response,
 )
 from werkzeug.utils import secure_filename
-from .lib import (
+from .lib.helpers import (
     validate_url,
     validate_soundfile,
 )
@@ -30,7 +30,7 @@ def authenticate() -> Optional[Response]:
     """
     token = request.headers.get('X-Authentication')
     if token:
-        g.user = User.verify_api_token(token)
+        g.user = User.find_by_api_token(token)
         return None
     else:
         return not_authorized()

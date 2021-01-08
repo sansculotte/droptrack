@@ -1,4 +1,8 @@
+Flask-Testing==0.8.1
 Fabric3==1.14.post1
 invoke==1.4.1
 pytest==5.3.5
+mock
+sqlalchemy-stubs
 mypy
+python-dotenv

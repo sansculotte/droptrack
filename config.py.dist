@@ -12,6 +12,8 @@ class Config(object):
     UPLOAD_DIR = os.path.join(os.getcwd(), 'data/upload')
     UPLOAD_ALLOWED_EXTENSIONS = {'wav', 'mp3', 'ogg'} 
     ROUTER = 'tcp://127.0.0.1:5100'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://droptrack:kcartpord@localhost:5432/droptrack'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 class StagingConfig(Config):
@@ -32,3 +34,4 @@ class ProductionConfig(Config):
 
 class TestingConfig(Config):
     TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'postgresql://droptrack:kcartpord@localhost:5432/droptrack_testing'
