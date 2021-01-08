@@ -13,12 +13,11 @@ from flask import (
     render_template,
     make_response,
 )
+from flask_migrate import Migrate  # type: ignore
 from .queue import Queue
 from .api import api
 from .api_smp import api_smp
-# from .filesys import walkdirlist
-
-dt_session_default = 'zniz'
+from .models import db
 
 ############################################################
 # data
@@ -35,7 +34,6 @@ def setup_routes(app: Flask):
     app.add_url_rule('/', 'root', root)
     app.register_blueprint(api)
     app.register_blueprint(api_smp, url_prefix='/api/smp')
-    # app.register_blueprint(api_smp)
 
 
 def setup_queue(app: Flask):
@@ -45,10 +43,8 @@ def setup_queue(app: Flask):
 
 def setup_logging(app: Flask):
     formatter = Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    default_level = 'debug' if app.config['DEBUG'] else 'info'
     address = app.config.get('LOG_ADDRESS', '/dev/log')
     facility = app.config.get('LOG_FACILITY', 'LOG_SYSLOG')
-    level = app.config.get('LOG_LEVEL', default_level)
     handler = SysLogHandler(
         address=address,
         facility=SysLogHandler.__dict__[facility],
@@ -67,7 +63,14 @@ def create_app() -> Flask:
         template_folder='templates'
     )
     app.config.from_object(APP_ENV)
+    db.init_app(app)
     setup_routes(app)
     setup_queue(app)
     setup_logging(app)
+    Migrate(app, db)
+
+    @app.shell_context_processor
+    def shell_context():
+        return {'app': app, 'db': db}
+
     return app

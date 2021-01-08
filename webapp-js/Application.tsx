@@ -3,6 +3,7 @@ import * as React from 'react'
 
 import ExpireMessage from 'components/ExpireMessage'
 import FileDrop from 'components/FileDrop'
+import FileList from 'components/FileList'
 
 import ApiResponse from 'interfaces/ApiResponse' 
 
@@ -12,11 +13,10 @@ interface Props {
 }
 
 interface State {
-    files: Array<any>
-    message?: string
-    url: string
-    dt_item: string
-    dt_items: Array<any>
+  files: Array<string>
+  message?: string
+  url: string
+  showFileList: boolean
 }
 
 class Application extends React.Component<Props, State> {
@@ -26,11 +26,14 @@ class Application extends React.Component<Props, State> {
       
     this.state = {
       files: [],
-	url: '',
-	dt_item: '',
-	dt_items: [],
+      url: '',
+      showFileList: false,
     }
 
+  }
+
+  public componentDidMount() {
+    this.loadFileList()
   }
 
   public render() {
@@ -51,7 +54,13 @@ class Application extends React.Component<Props, State> {
           <input type="button" onClick={this.handleDropUrl.bind(this)} value="Drop" />
           <FileDrop accept="audio/*" onDrop={this.handleDropFile.bind(this)} />
         </form>
-	    
+        {this.state.showFileList
+          ? <>
+              <input type="button" onClick={this.hideFileList.bind(this)} value="Hide Files" />
+              <FileList files={this.state.files} />
+            </>
+          : <input type="button" onClick={this.showFileList.bind(this)} value="Show Files"/>
+        }
       </main>
     )
   }
@@ -80,6 +89,22 @@ class Application extends React.Component<Props, State> {
       const { message } = response
       this.setState({message})
     }).catch(console.error)
+  }
+
+  showFileList() {
+    this.setState({showFileList: true}, () => this.loadFileList())
+  }
+
+  hideFileList() {
+    this.setState({showFileList: false})
+  }
+  
+  async loadFileList() {
+    const response = await http.get('/files')
+    if (response.status === 'ok') {
+      const { files } = response
+      this.setState({files})
+    }
   }
 }
 

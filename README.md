@@ -12,19 +12,33 @@ Bring your own track to the party
 - curl
 - moc
 - zmq
+- postgres
 
 
 ## Setup
 
-Setup your python environment, virtualenv or other method.
+Setup your python environment, through virtualenv or your preferred method.
 
-Setup node environment, nvm or other method.
+Setup node environment, nvm or your preferred method.
 
 Install python dependencies
 
     pip install -r requirements
     pip install -r dev-requirements
 
+Install postgres
+
+system install, container (your preferred method)
+
+Run migrations
+
+    flask db upgrade
+
+Create User
+
+    ./cli.py user create <name> <email>
+    -> <password>
+    -> <api_key>
 
 *Webapp/Server*
 

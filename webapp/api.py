@@ -21,7 +21,7 @@ from flask import (
     Response,
 )
 from werkzeug.utils import secure_filename
-from .lib import (
+from .lib.helpers import (
     validate_url,
     validate_soundfile,
 )
@@ -40,7 +40,7 @@ def authenticate() -> Optional[Response]:
     """
     token = request.headers.get('X-Authentication')
     if token:
-        g.user = User.verify_api_token(token)
+        g.user = User.find_by_api_key(token)
         return None
     else:
         return not_authorized()
@@ -81,7 +81,11 @@ def url() -> Response:
     return Response(status=405)
 
 
-def upload_POST():
+@api.route('/files', methods=['POST', 'GET'])
+def upload() -> Response:
+    """
+    Accept direct soundfile upload per multipart/form-data
+    """
     if request.method == 'POST':
         soundfile = request.files.get('soundfile')
             
@@ -113,11 +117,16 @@ def upload_POST():
             })
         else:
             return api_response_error({'message': 'Invalid File'})
+
+    if request.method == 'GET':
+        files = os.listdir(g.user.home_directory)
+        visible_files = [f for f in files if not f.startswith('.')]
+        return api_response_ok({'files': visible_files})
+
     return Response(status=405)
 
 def upload_GET():
     files = walkdirlist(
-        # startpath=app.dt_session_data_dir,
         startpath=g.user.home_directory,
         verbose=False
     )
@@ -126,17 +135,6 @@ def upload_GET():
         'message': 'upload_GET',
         'files': files,
     })
-
-@api.route('/files', methods=['GET', 'POST'])
-def upload() -> Response:
-    """
-    Accept direct soundfile upload per multipart/form-data
-    """
-    if request.method == 'POST':
-        return upload_POST()
-    elif request.method == 'GET':
-        return upload_GET()
-
 
 @api.route('/files/<path:filename>', methods=['GET'])
 def download(filename: str) -> Response:
@@ -151,7 +149,7 @@ def download(filename: str) -> Response:
     )
     
 
-@api.route('/files/<string:filename>', methods=['DELETE'])
+@api.route('/files/<path:filename>', methods=['DELETE'])
 def delete_file(filename: str) -> Response:
     """
     Delete stored file

@@ -1,3 +1,8 @@
+Flask-SQLAlchemy==2.4.4
+flask-login==0.5.0
+SQLAlchemy==1.3.22
+Flask-Migrate==2.5.3
+psycopg2-binary
 args==0.1.0
 certifi==2019.11.28
 cffi==1.14.0

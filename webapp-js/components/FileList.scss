@@ -1,0 +1,11 @@
+ul.fileList {
+  padding: 0;
+  list-style: none;
+  &>li {
+    width: 100%;
+    padding: 4px 0 4px 6px;
+    &:hover {
+      background-color: #edd;
+    }
+  }
+}

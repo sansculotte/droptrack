@@ -42,6 +42,19 @@ def authenticate() -> Optional[Response]:
         return not_authorized()
 
 
+def upload_GET():
+    files = walkdirlist(
+        startpath=g.user.home_directory,
+        verbose=False
+    )
+
+    return api_response_ok({
+        'message': 'upload_GET',
+        'files': files,
+    })
+
+
+
 ############################################################
 # api definition: all routes
 # file in/out: url, upload, download
