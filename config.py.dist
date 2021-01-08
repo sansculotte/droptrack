@@ -32,6 +32,11 @@ class ProductionConfig(Config):
     UPLOAD_DIR = '/opt/droptrack/upload'
 
 
+class DevelopmentConfig(Config):
+    DEBUG = True
+    DEVELOPMENT = True
+
+
 class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'postgresql://droptrack:kcartpord@localhost:5432/droptrack_testing'

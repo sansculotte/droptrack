@@ -16,16 +16,16 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(length=64), nullable=False, unique=True)
     email = db.Column(db.String(length=128), nullable=True, unique=True)
-    password = db.Column(Password)
-    api_token = db.Column(db.String(length=128), nullable=True, unique=True)
+    password = db.Column(Password())
+    api_key = db.Column(db.String(length=128), nullable=True, unique=True)
 
     @staticmethod
-    def find_by_api_token(token: str) -> Optional['User']:
+    def find_by_api_key(token: str) -> Optional['User']:
         """
         Find User by API token
         """
         if token:
-            return User.query.filter_by(api_token=token).one()
+            return User.query.filter_by(api_key=token).one()
         return None
 
     @staticmethod

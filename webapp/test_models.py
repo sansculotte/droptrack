@@ -6,9 +6,9 @@ from .models import User
 class UserModelTest(BaseTestCase):
 
     def test_user_model_instanciation(self):
-        user = User(name='name', api_token='api_key_XXX')
+        user = User(name='name', api_key='api_key_XXX')
         assert user.name == 'name'
-        assert user.api_token == 'api_key_XXX'
+        assert user.api_key == 'api_key_XXX'
 
     @mock.patch('webapp.models.User.make_home_directory')
     def test_user_create(self, m):

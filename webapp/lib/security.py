@@ -1,5 +1,8 @@
 from typing import Optional
+import hashlib
 import os
+import random
+import uuid
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
@@ -10,7 +13,7 @@ SALT_LENGTH = 16
 class PasswordHash():
 
     def __init__(self, h: str):
-        assert len(h) == 165, 'pbkdf2:512 with 16 bytes salt is 165 chars.'
+        assert len(h) == 166, f'pbkdf2:512 with 16 bytes salt is 165 chars. {h}'
         assert h.count('$'), 'pbkdf2 hash should have 2x "$".'
         self.hash = h
 
@@ -46,3 +49,9 @@ def generate_password(length: int = 16) -> str:
     return ''.join(
         chars[c % scope] for c in os.urandom(length)
     )
+
+
+def generate_api_key(length=64):
+    random.seed = os.urandom(1024)
+    token = uuid.uuid4().hex + str(random.random())
+    return 'dt_{}'.format(hashlib.sha256(token.encode()).hexdigest())

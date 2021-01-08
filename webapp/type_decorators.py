@@ -7,7 +7,7 @@ class Password(TypeDecorator):
     """
     Automaticly hash and unhash passwords in and out of the database
     """
-    impl = CHAR(165)
+    impl = CHAR(166)
 
     def process_bind_param(
         self,

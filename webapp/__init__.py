@@ -60,4 +60,9 @@ def create_app() -> Flask:
     setup_queue(app)
     setup_logging(app)
     Migrate(app, db)
+
+    @app.shell_context_processor
+    def shell_context():
+        return {'app': app, 'db': db}
+
     return app
