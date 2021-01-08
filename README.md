@@ -55,8 +55,9 @@ make the commands shorter it is good to put these redundant bits into
 a curl command line fragment and include that in the call. First
 create the fragment with
 
-`echo -e "-H \"X-Authentication: yuOJX-8paOqRJR8iefr7vL-Ozu5owbSUtr8SIM0K1L1EKPB9mWjPM52nydMEFyl7\"" >headauth`
-`echo -e "-H \"X-Authentication: yuOJX-8paOqRJR8iefr7vL-Ozu5owbSUtr8SIM0K1L1EKPB9mWjPM52nydMEFyl7\"\n-H \"Content-Type: application/json\"" >headjson`
+```echo -e "-H \"X-Authentication: yuOJX-8paOqRJR8iefr7vL-Ozu5owbSUtr8SIM0K1L1EKPB9mWjPM52nydMEFyl7\"" >headauth
+echo -e "-H \"X-Authentication: yuOJX-8paOqRJR8iefr7vL-Ozu5owbSUtr8SIM0K1L1EKPB9mWjPM52nydMEFyl7\"\n-H \"Content-Type: application/json\"" >headjson
+```
 
 ### API file upload / download
 
