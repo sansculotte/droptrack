@@ -31,9 +31,9 @@ def authenticate() -> Optional[Response]:
     token = request.headers.get('X-Authentication')
     if token:
         g.user = User.find_by_api_key(token)
-        return None
-    else:
-        return not_authorized()
+        if g.user:
+            return None
+    return not_authorized()
 
 
 def not_authorized(error=None, message='not authorized') -> Response:
