@@ -6,6 +6,7 @@ import FileDrop from 'components/FileDrop'
 import FileList from 'components/FileList'
 
 import ApiResponse from 'interfaces/ApiResponse' 
+import File from 'interfaces/File'
 
 import * as style from './Application.scss'
 
@@ -13,7 +14,7 @@ interface Props {
 }
 
 interface State {
-  files: Array<string>
+  files: Array<File>
   message?: string
   url: string
   showFileList: boolean
