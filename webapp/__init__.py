@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import atexit
 from logging import Formatter
 from logging.handlers import SysLogHandler
@@ -7,8 +6,10 @@ from flask import (
     Flask,
     render_template,
 )
+from flask_migrate import Migrate  # type: ignore
 from .queue import Queue
 from .api import api
+from .models import db
 
 
 try:
@@ -33,10 +34,8 @@ def setup_queue(app: Flask):
 
 def setup_logging(app: Flask):
     formatter = Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    default_level = 'debug' if app.config['DEBUG'] else 'info'
     address = app.config.get('LOG_ADDRESS', '/dev/log')
     facility = app.config.get('LOG_FACILITY', 'LOG_SYSLOG')
-    level = app.config.get('LOG_LEVEL', default_level)
     handler = SysLogHandler(
         address=address,
         facility=SysLogHandler.__dict__[facility],
@@ -56,7 +55,14 @@ def create_app() -> Flask:
         template_folder='templates'
     )
     app.config.from_object(APP_ENV)
+    db.init_app(app)
     setup_routes(app)
     setup_queue(app)
     setup_logging(app)
+    Migrate(app, db)
+
+    @app.shell_context_processor
+    def shell_context():
+        return {'app': app, 'db': db}
+
     return app

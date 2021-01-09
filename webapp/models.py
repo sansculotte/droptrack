@@ -1,47 +1,60 @@
 import os
-from typing import Optional, Union
+from typing import Optional
 from flask import current_app
-from dataclasses import dataclass
+from flask_sqlalchemy import SQLAlchemy  # type: ignore
+from .type_decorators import Password
+from webapp.lib.security import generate_password
 
 
-_users = [
-    {
-        'id': 1,
-        'name': 'x',
-        'api_token': 'yuOJX-8paOqRJR8iefr7vL-Ozu5owbSUtr8SIM0K1L1EKPB9mWjPM52nydMEFyl7',
-    }
-]
+db: SQLAlchemy = SQLAlchemy()
 
 
-class Token:
+class User(db.Model):
 
-    __token: str
+    __tablename__ = 'user'
 
-    def __init__(self, token):
-        assert len(token) == 64
-        self.__token = token
-
-    def __str__(self):
-        return self.__token
-
-    def __eq__(self, other: object):
-        return str(self) == other
-
-
-@dataclass
-class User:
-
-    id: int
-    name: str
-    api_token: str
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(length=64), nullable=False, unique=True)
+    email = db.Column(db.String(length=128), nullable=True, unique=True)
+    password = db.Column(Password())
+    api_key = db.Column(db.String(length=128), nullable=True, unique=True)
 
     @staticmethod
-    def verify_api_token(token: str) -> Optional['User']:
+    def find_by_api_key(token: str) -> Optional['User']:
+        """
+        Find User by API token
+        """
         if token:
-            for user in _users:
-                if user['api_token'] == token:
-                    return User(**user)
+            return User.query.filter_by(api_key=token).one()
         return None
+
+    @staticmethod
+    def find_by_name(name: str) -> Optional['User']:
+        """
+        Find User by name
+        """
+        if name:
+            return User.query.filter_by(name=name).one()
+        return None
+
+    @staticmethod
+    def create(name: str, email: str, password: str) -> 'User':
+        """
+        create new User
+        """
+        password = password or generate_password()
+
+        user = User(name=name, email=email, password=password)
+
+        try:
+            user.make_home_directory()
+        except FileExistsError:
+            current_app.logger.warn('home directory {user.name} already exists')
+
+        return user
+
+    def check_password(self, password: str):
+        return self.password == password
 
     @property
     def home_directory(self):

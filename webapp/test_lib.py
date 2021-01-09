@@ -1,4 +1,4 @@
-from .lib import validate_url
+from .lib.helpers import validate_url
 
 
 def test_validate_url_success():
