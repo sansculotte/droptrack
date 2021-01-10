@@ -25,7 +25,7 @@ class User(db.Model):
         Find User by API token
         """
         if token:
-            return User.query.filter_by(api_key=token).one()
+            return User.query.filter_by(api_key=token).first()
         return None
 
     @staticmethod
@@ -34,7 +34,7 @@ class User(db.Model):
         Find User by name
         """
         if name:
-            return User.query.filter_by(name=name).one()
+            return User.query.filter_by(name=name).first()
         return None
 
     @staticmethod

@@ -1,3 +1,3 @@
 export default {
-  API_KEY: 'yuOJX-8paOqRJR8iefr7vL-Ozu5owbSUtr8SIM0K1L1EKPB9mWjPM52nydMEFyl7'
+  API_KEY: 'dt_c4d41238b9878a01b315bad05045f876685b467b3f067dce56e640f07830b1ea'
 }

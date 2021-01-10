@@ -46,9 +46,9 @@ def authenticate() -> Optional[Response]:
     token = request.headers.get('X-Authentication')
     if token:
         g.user = User.find_by_api_key(token)
-        return None
-    else:
-        return not_authorized()
+        if g.user:
+            return None
+    return not_authorized()
 
 
 def not_authorized(error=None, message='not authorized') -> Response:
@@ -86,60 +86,46 @@ def url() -> Response:
     return Response(status=405)
 
 
-@api.route('/files', methods=['POST', 'GET'])
+@api.route('/files', methods=['GET'])
+def list_files() -> Response:
+    """
+    List files in workspace
+    """
+    files = os.listdir(g.user.home_directory)
+    return api_response_ok({
+        'files': [
+            {'name': name} for name in files if not name.startswith('.')
+        ]
+    })
+
+
+@api.route('/files', methods=['POST'])
 def upload() -> Response:
     """
     Accept direct soundfile upload per multipart/form-data
     """
-    if request.method == 'POST':
-        soundfile = request.files.get('soundfile')
-            
-        if soundfile and validate_soundfile(soundfile):
-            filename = secure_filename(soundfile.filename)
+    soundfile = request.files.get('soundfile')
+    if soundfile and validate_soundfile(soundfile):
+        filename = secure_filename(soundfile.filename)
 
-            # make sure home directory exists.
-            if not os.path.exists(g.user.home_directory):
-                g.user.make_home_directory()
-                current_app.logger.info(
-                    f'User Home directory created {g.user.home_directory}'
-                )
-
-            location = os.path.join(
-                g.user.home_directory,
-                filename
+        # make sure home directory exists.
+        if not os.path.exists(g.user.home_directory):
+            g.user.make_home_directory()
+            current_app.logger.info(
+                f'User Home directory created {g.user.home_directory}'
             )
-            soundfile.save(location)
-            soundfilesize = os.path.getsize(location)
-            
-            # trigger player for redownload
-            url = url_for('api.download', filename=filename, _external=True)
-            current_app.queue.send(url)
 
-            # return response
-            return api_response_ok({
-                'message': 'File accepted',
-                'soundfilesize': soundfilesize,
-            })
-        else:
-            return api_response_error({'message': 'Invalid File'})
+        location = os.path.join(
+            g.user.home_directory,
+            filename
+        )
+        soundfile.save(location)
+        url = url_for('api.download', filename=filename, _external=True)
+        current_app.queue.send(url)
+        return api_response_ok({'message': 'File accepted'})
+    else:
+        return api_response_error({'message': 'Invalid File'})
 
-    if request.method == 'GET':
-        files = os.listdir(g.user.home_directory)
-        visible_files = [f for f in files if not f.startswith('.')]
-        return api_response_ok({'files': visible_files})
-
-    return Response(status=405)
-
-def upload_GET():
-    files = walkdirlist(
-        startpath=g.user.home_directory,
-        verbose=False
-    )
-
-    return api_response_ok({
-        'message': 'upload_GET',
-        'files': files,
-    })
 
 @api.route('/files/<path:filename>', methods=['GET'])
 def download(filename: str) -> Response:

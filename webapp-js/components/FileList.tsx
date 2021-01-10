@@ -1,14 +1,14 @@
+import File from 'interfaces/File'
 import * as React from 'react'
 import * as styles from './FileList.scss'
 
-interface Props {
-    files: Array<string>
-}
 
-export default (props: Props) => {
+export default (props: {files: Array<File>}) => {
   return (
     <ul className={styles.fileList}>
-      {props.files.map(file => <li>{ file }</li>)}
+      {props.files.map((file, index) =>
+        <li key={`file_${index}`}>{ file.name }</li>)
+      }
     </ul>
   )
 }
