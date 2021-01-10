@@ -1,6 +1,5 @@
 declare var API_URL: string
 import 'whatwg-fetch'
-import config from 'config'
 
 interface ApiData {
   [key: string]: string | number | ApiData
@@ -23,7 +22,7 @@ async function request(
 ) {
   headers = headers || new Headers({
     'Content-Type': 'application/json',
-    'X-Authentication': config.API_KEY
+    'X-Authentication': window.localStorage.getItem('apiKey') || ''
   })
   const credentials = 'same-origin'
   const response = await fetch(url, { body, method, headers, mode, credentials })
@@ -53,7 +52,7 @@ async function post(path: string, data: ApiData) {
 async function upload(path: string, file: any, fieldname: string='file') {
   // do not set content-type header
   const headers = new Headers({
-    'X-Authentication': config.API_KEY
+    'X-Authentication': window.localStorage.getItem('apiKey') || ''
   })
   const body = new FormData()
   body.append(fieldname, file)

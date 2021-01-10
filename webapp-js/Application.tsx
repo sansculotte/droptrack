@@ -1,38 +1,36 @@
-import http from 'lib/http'
 import * as React from 'react'
 
+import AuthModal from 'components/AuthModal'
+import Dashboard from 'components/Dashboard'
 import ExpireMessage from 'components/ExpireMessage'
-import FileDrop from 'components/FileDrop'
-import FileList from 'components/FileList'
-
-import ApiResponse from 'interfaces/ApiResponse' 
-import File from 'interfaces/File'
 
 import * as style from './Application.scss'
+
 
 interface Props {
 }
 
 interface State {
-  files: Array<File>
+  authenticate: boolean
   message?: string
-  url: string
-  showFileList: boolean
 }
+
 
 class Application extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props)
     this.state = {
-      files: [],
-      url: '',
-      showFileList: false,
+      message: undefined,
+      authenticate: false,
     }
   }
 
   public componentDidMount() {
-    this.loadFileList()
+    const apiKey = window.localStorage.getItem('apiKey')
+    if (apiKey === null) {
+      this.setState({authenticate: true})
+    }
   }
 
   public render() {
@@ -42,68 +40,21 @@ class Application extends React.Component<Props, State> {
         {this.state.message &&
           <ExpireMessage delay={2000}>{this.state.message}</ExpireMessage>
         }
-        <form>
-          <input
-            name="url"
-            type="url"
-            placeholder="soundfile url"
-            onChange={this.handleChangeUrl.bind(this)}
-            value={this.state.url}
-          />
-          <input type="button" onClick={this.handleDropUrl.bind(this)} value="Drop" />
-          <FileDrop accept="audio/*" onDrop={this.handleDropFile.bind(this)} />
-        </form>
-        {this.state.showFileList
-          ? <>
-              <input type="button" onClick={this.hideFileList.bind(this)} value="Hide Files" />
-              <FileList files={this.state.files} />
-            </>
-          : <input type="button" onClick={this.showFileList.bind(this)} value="Show Files"/>
+        {this.state.authenticate
+          ? <AuthModal setKey={this.setKey.bind(this)} />
+          : <Dashboard flashMessage={this.flashMessage.bind(this)} />
         }
       </main>
     )
   }
 
-  handleDropFile(files: Array<any>) {
-    const results = files.map(f => http.upload('/files', f, 'soundfile'))
-    if (results.length > 0) {
-      results[0].then((response: ApiResponse) => {
-        const { message } = response
-        this.setState({message})
-      }).catch((error: ApiResponse) => console.error(error))
-    }
-    else {
-        console.error('no files')
-    }
+  private setKey(key: string) {
+    window.localStorage.setItem('apiKey', key)
+    this.setState({ authenticate: false })
   }
 
-  handleChangeUrl(ev: React.FormEvent<HTMLInputElement>) {
-    const url = ev.currentTarget.value
-    this.setState({url})
-  }
-
-  handleDropUrl(ev: React.MouseEvent) {
-    ev.preventDefault()
-    http.post('/url', {url: this.state.url}).then((response: ApiResponse) => {
-      const { message } = response
-      this.setState({message})
-    }).catch(console.error)
-  }
-
-  showFileList() {
-    this.setState({showFileList: true}, () => this.loadFileList())
-  }
-
-  hideFileList() {
-    this.setState({showFileList: false})
-  }
-  
-  async loadFileList() {
-    const response = await http.get('/files')
-    if (response.status === 'ok') {
-      const { files } = response
-      this.setState({files})
-    }
+  private flashMessage(message: string) {
+    this.setState({ message })
   }
 }
 
