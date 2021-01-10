@@ -13,11 +13,9 @@ from flask import (
     render_template,
     make_response,
 )
-from flask_migrate import Migrate  # type: ignore
 from .queue import Queue
 from .api import api
 from .api_smp import api_smp
-from .models import db
 
 ############################################################
 # data
@@ -27,6 +25,17 @@ try:
 except KeyError:
     APP_ENV = 'config.Config'
 
+print(APP_ENV)
+    
+
+if 'APP_ENV_BACKEND_USER' in os.environ and os.environ['APP_ENV_BACKEND_USER'] == 'postgres':
+    from .models_postgres import db
+    from flask_migrate import Migrate  # type: ignore
+elif 'APP_ENV_BACKEND_USER' in os.environ and os.environ['APP_ENV_BACKEND_USER'] == 'plain':
+    from .models_plain import db
+    from .models_plain import Migrate
+
+    
 def root():
     return render_template('main.html')
 
@@ -67,7 +76,8 @@ def create_app() -> Flask:
     setup_routes(app)
     setup_queue(app)
     setup_logging(app)
-    Migrate(app, db)
+    if app.config['BACKEND_USER']:
+        Migrate(app, db)
 
     @app.shell_context_processor
     def shell_context():

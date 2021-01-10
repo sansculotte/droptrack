@@ -6,6 +6,9 @@ from smp_audio.autoedit import main_autoedit
 from smp_audio.autocover import autocover_conf_default
 from smp_audio.autocover import main_autocover
 
+from smp_audio.automaster import automaster_conf_default
+from smp_audio.automaster import main_automaster
+
 def run_autoedit_2(*args, **kwargs):
     # print(f'run_autoedit args_ns {args_ns}')
 

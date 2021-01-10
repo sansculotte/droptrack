@@ -25,8 +25,13 @@ from .lib.helpers import (
     validate_url,
     validate_soundfile,
 )
-from .models import User
 from .filesys import walkdirlist
+
+if 'APP_ENV_BACKEND_USER' in os.environ and os.environ['APP_ENV_BACKEND_USER'] == 'postgres':
+    from .models_postgres import User
+elif 'APP_ENV_BACKEND_USER' in os.environ and os.environ['APP_ENV_BACKEND_USER'] == 'plain':
+    from .models_plain import User
+
 """
 The main mechanics of the webapp.
 """
