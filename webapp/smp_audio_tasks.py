@@ -1,4 +1,5 @@
 # from argparse import Namespace
+from smp_audio.common import autofilename
 from smp_audio.util import kw2ns, ns2kw
 from smp_audio.autoedit import autoedit_conf_default
 from smp_audio.autoedit import main_autoedit

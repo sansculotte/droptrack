@@ -33,6 +33,9 @@ def create_user(name, email):
 def list_users():
     for u in User.query.all():
         click.echo('-----------------------------------')
+        click.echo(f'u {u}')
+        if u is None:
+            continue
         click.echo(f'id:      {u.id}')
         click.echo(f'name:    {u.name}')
         click.echo(f'email:   {u.email}')

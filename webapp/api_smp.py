@@ -14,10 +14,12 @@ from flask import (
     Blueprint,
     Response,
 )
+from .models import User
 from .filesys import walkdirlist
 
 from multiprocessing import Process
 
+from .smp_audio_tasks import autofilename
 from .smp_audio_tasks import ns2kw, kw2ns
 from .smp_audio_tasks import run_autoedit_2, autoedit_conf_default
 from .smp_audio_tasks import main_autocover, autocover_conf_default
@@ -25,11 +27,6 @@ from .smp_audio_tasks import main_automaster, automaster_conf_default
 
 from .api import authenticate, not_authorized
 from .api import api_response_ok, api_response_started, api_response_error
-
-if 'APP_ENV_BACKEND_USER' in os.environ and os.environ['APP_ENV_BACKEND_USER'] == 'postgres':
-    from .models_postgres import User
-elif 'APP_ENV_BACKEND_USER' in os.environ and os.environ['APP_ENV_BACKEND_USER'] == 'plain':
-    from .models_plain import User
 
 api_smp = Blueprint('api/smp', __name__)
 
@@ -39,11 +36,12 @@ def authenticate() -> Optional[Response]:
     verify token, bind user to request global
     """
     token = request.headers.get('X-Authentication')
+    current_app.logger.info(f'api.authenticate token = {token}')
     if token:
-        g.user = User.verify_api_token(token)
-        return None
-    else:
-        return not_authorized()
+        g.user = User.find_by_api_key(token)
+        if g.user:
+            return None
+    return not_authorized()
 
 
 ############################################################
@@ -65,6 +63,14 @@ returns: list of itemrefs
 
 
 """
+def process_create_pid_file(process, args):
+    filename = os.path.join(args.rootdir, 'data', args.mode, args.filename_export[:-4])
+    filename += '.pid'
+    f = open(filename, 'w')
+    f.write(f'{process.name}/{process.pid}')
+    f.close()
+    return filename
+
 def autoedit_POST():
     # request
     # configure and run autoedit
@@ -79,22 +85,23 @@ def autoedit_POST():
             setattr(autoedit_conf, k, v_req)
 
     autoedit_conf.filenames = [os.path.join(g.user.home_directory, filename) for filename in autoedit_conf.filenames]
+    autoedit_conf.filename_export = autofilename(autoedit_conf)
             
     current_app.logger.info(f'api_smp.autoedit_POST autoedit_conf_request {autoedit_conf}')
-
+    
     # function map request
     # create process with computation = heavy 
     # heavy = anything taking more than a few seconds
     heavy_process = Process(
         target=run_autoedit_2, # my_func
-        # args=autoedit_conf,
         kwargs={
             'autoedit_conf': autoedit_conf,
         },
         daemon=True,
     )
     heavy_process.start()
-    location = "data/autoedit-0-DUMMY.wav"
+    # create pid file in work dir
+    processhandle = process_create_pid_file(heavy_process, autoedit_conf)
     # response
     return api_response_started({
         'message': 'autoedit started',
@@ -102,11 +109,15 @@ def autoedit_POST():
             # function
             'name': 'autoedit',
             # input arguments
-            'conf': autoedit_conf,
+            'conf': ns2kw(autoedit_conf),
             # output returned
             'result': {
-                'location': location,
-            }, 
+                'processhandle': processhandle,
+                'location': os.path.join(
+                    'data',
+                    os.path.basename(autoedit_conf.filename_export)
+                ),
+            },
         }
     })
 
@@ -231,6 +242,7 @@ def automaster_POST():
     automaster_conf = kw2ns(automaster_conf_default)
     current_app.logger.info(f'api_smp.automaster_POST automaster_conf_default {automaster_conf}')
 
+    # request data
     request_data = request.json
     for k in automaster_conf_default:
         k_req = f'{k}'
@@ -240,11 +252,20 @@ def automaster_POST():
 
     automaster_conf.filenames = [os.path.join(g.user.home_directory, filename) for filename in automaster_conf.filenames]
     automaster_conf.references = [os.path.join(g.user.home_directory, reference) for reference in automaster_conf.references]
-            
+    automaster_conf.filename_export = autofilename(automaster_conf)
+    
     current_app.logger.info(f'api_smp.automaster_POST automaster_conf_request {automaster_conf}')
     
-    res = main_automaster(automaster_conf)
+    heavy_process = Process(
+        target=main_automaster,
+        args=[automaster_conf],
+        daemon=True,
+    )
+    heavy_process.start()
+    # create pid file in work dir
+    processhandle = process_create_pid_file(heavy_process, automaster_conf)
     
+    # res = main_automaster(automaster_conf)
     return api_response_ok({
         'message': 'automaster result',
         'data': {
@@ -253,7 +274,13 @@ def automaster_POST():
             # input arguments
             'conf': ns2kw(automaster_conf),
             # output returned
-            'result': res, 
+            'result': {
+                'processhandle': processhandle,
+                'location': os.path.join(
+                    'data',
+                    os.path.basename(automaster_conf.filename_export)
+                ),
+            }
         }
     })
 

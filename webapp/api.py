@@ -1,21 +1,11 @@
-"""droptrack.webapp.api
-
-The main mechanics of the webapp.
-
-This is NOT proper REST.
-"""
-
-
 from typing import Optional
 import os
 from flask import (
     g,
     current_app,
     json,
-    jsonify,
     request,
     url_for,
-    session,
     send_from_directory,
     Blueprint,
     Response,
@@ -25,18 +15,13 @@ from .lib.helpers import (
     validate_url,
     validate_soundfile,
 )
-from .filesys import walkdirlist
-
-if 'APP_ENV_BACKEND_USER' in os.environ and os.environ['APP_ENV_BACKEND_USER'] == 'postgres':
-    from .models_postgres import User
-elif 'APP_ENV_BACKEND_USER' in os.environ and os.environ['APP_ENV_BACKEND_USER'] == 'plain':
-    from .models_plain import User
-
+from .models import User
 """
 The main mechanics of the webapp.
 """
 
 api = Blueprint('api', __name__)
+
 
 @api.before_request
 def authenticate() -> Optional[Response]:
@@ -44,6 +29,7 @@ def authenticate() -> Optional[Response]:
     verify token, bind user to request global
     """
     token = request.headers.get('X-Authentication')
+    current_app.logger.info(f'api.authenticate token = {token}')
     if token:
         g.user = User.find_by_api_key(token)
         if g.user:
@@ -60,9 +46,9 @@ def api_response_ok(data: dict, status: int = 200) -> Response:
     return Response(json.dumps(data), status=status)
 
 
-def api_response_started(data: dict) -> Response:
+def api_response_started(data: dict, status: int = 202) -> Response:
     data.update({'status': 202})
-    return jsonify(data)
+    return Response(json.dumps(data), status=status)
 
 
 def api_response_error(data: dict, status: int = 400) -> Response:
