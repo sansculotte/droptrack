@@ -1,43 +1,27 @@
-# -*- coding: utf-8 -*-
-import string, random
-from pprint import pformat
 import atexit
 from logging import Formatter
 from logging.handlers import SysLogHandler
 import os
 from flask import (
     Flask,
-    current_app,
-    request,
-    session,
     render_template,
-    make_response,
 )
+from flask_migrate import Migrate # type: ignore
 from .queue import Queue
 from .api import api
+from .models import db
 from .api_smp import api_smp
 
-############################################################
-# data
 
 try:
     APP_ENV = os.environ['APP_ENV']
 except KeyError:
     APP_ENV = 'config.Config'
 
-print(APP_ENV)
-    
-
-if 'APP_ENV_BACKEND_USER' in os.environ and os.environ['APP_ENV_BACKEND_USER'] == 'postgres':
-    from .models_postgres import db
-    from flask_migrate import Migrate  # type: ignore
-elif 'APP_ENV_BACKEND_USER' in os.environ and os.environ['APP_ENV_BACKEND_USER'] == 'plain':
-    from .models_plain import db
-    from .models_plain import Migrate
-
     
 def root():
     return render_template('main.html')
+
 
 def setup_routes(app: Flask):
     app.add_url_rule('/', 'root', root)
@@ -61,6 +45,7 @@ def setup_logging(app: Flask):
     handler.setFormatter(formatter)
     app.logger.addHandler(handler)
 
+
 def create_app() -> Flask:
     """
     Using the app-factory pattern
@@ -76,8 +61,7 @@ def create_app() -> Flask:
     setup_routes(app)
     setup_queue(app)
     setup_logging(app)
-    if app.config['BACKEND_USER']:
-        Migrate(app, db)
+    Migrate(app, db)
 
     @app.shell_context_processor
     def shell_context():
