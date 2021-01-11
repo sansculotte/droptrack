@@ -3,8 +3,9 @@ import * as React from 'react'
 import http from 'lib/http'
 import FileDrop from './FileDrop'
 import FileList from './FileList'
+import FileUrl from './FileUrl'
 
-import ApiResponse from 'interfaces/ApiResponse' 
+import ApiResponse from 'interfaces/ApiResponse'
 import File from 'interfaces/File'
 import Task from 'interfaces/Task'
 
@@ -17,7 +18,6 @@ interface State {
   files: Array<File>
   tasks: Array<Task>
   message?: string
-  url: string
   showFileList: boolean
 }
 
@@ -28,7 +28,7 @@ class Workspace extends React.Component<Props, State> {
     super(props)
     this.state = {
       files: [],
-      url: '',
+      tasks: [],
       showFileList: false,
     }
   }
@@ -39,26 +39,20 @@ class Workspace extends React.Component<Props, State> {
 
   render() {
     return (
-      <>
-      <form>
-        <input
-          name="url"
-          type="url"
-          placeholder="soundfile url"
-          onChange={this.handleChangeUrl.bind(this)}
-          value={this.state.url}
-        />
-        <input type="button" onClick={this.handleDropUrl.bind(this)} value="Drop" />
-        <FileDrop accept="audio/*" onDrop={this.handleDropFile.bind(this)} />
-      </form>
-      {this.state.showFileList
-        ? <>
-            <input type="button" onClick={this.hideFileList.bind(this)} value="Hide Files" />
-            <FileList files={this.state.files} />
-          </>
-        : <input type="button" onClick={this.showFileList.bind(this)} value="Show Files"/>
-      }
-      </>
+      <div>
+
+        <form>
+          <FileUrl flashMessage={this.props.flashMessage} />
+          <FileDrop accept="audio/*" onDrop={this.handleDropFile.bind(this)} />
+        </form>
+        {this.state.showFileList
+          ? <>
+              <input type="button" onClick={this.hideFileList.bind(this)} value="Hide Files" />
+              <FileList files={this.state.files} />
+            </>
+          : <input type="button" onClick={this.showFileList.bind(this)} value="Show Files"/>
+        }
+      </div>
     )
   }
 
@@ -75,19 +69,6 @@ class Workspace extends React.Component<Props, State> {
     }
   }
 
-  handleChangeUrl(ev: React.FormEvent<HTMLInputElement>) {
-    const url = ev.currentTarget.value
-    this.setState({url})
-  }
-
-  handleDropUrl(ev: React.MouseEvent) {
-    ev.preventDefault()
-    http.post('/url', {url: this.state.url}).then((response: ApiResponse) => {
-      const { message } = response
-      this.props.flashMessage(message)
-    }).catch(console.error)
-  }
-
   showFileList() {
     this.setState({showFileList: true}, () => this.loadFileList())
   }
@@ -95,7 +76,7 @@ class Workspace extends React.Component<Props, State> {
   hideFileList() {
     this.setState({showFileList: false})
   }
-  
+
   async loadFileList() {
     const response = await http.get('/files')
     if (response.status === 'ok') {

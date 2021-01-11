@@ -3,8 +3,6 @@ import { useState } from 'react'
 import { useInterval } from 'hooks/useInterval'
 
 
-const randomByte = () => Math.round(Math.random() * 255).toString(16)
-
 export default () => {
 
   const [ color, setColor ] = useState('#000')

@@ -40,7 +40,10 @@ class Application extends React.Component<Props, State> {
       <main className={style.app}>
         <h1>Droptrack<Ping /></h1>
         {this.state.message &&
-          <ExpireMessage delay={2000}>{this.state.message}</ExpireMessage>
+          <ExpireMessage
+            delay={2000}
+            timeStamp={new Date().getTime()}
+          >{this.state.message}</ExpireMessage>
         }
         {this.state.authenticate
           ? <AuthModal setKey={this.setKey.bind(this)} />

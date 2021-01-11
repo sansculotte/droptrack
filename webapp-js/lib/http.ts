@@ -30,7 +30,7 @@ async function request(
     const json = await response.json()
     return json
   }
-  console.error(await response.json())
+  return await response.json()
 }
 
 async function get(path: string, params?:Array<[string, string]>) {
