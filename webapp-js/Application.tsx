@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import AuthModal from 'components/AuthModal'
-import Dashboard from 'components/Dashboard'
+import Workspace from 'components/Workspace'
 import ExpireMessage from 'components/ExpireMessage'
 
 import Ping from 'components/Ping'
@@ -44,7 +44,7 @@ class Application extends React.Component<Props, State> {
         }
         {this.state.authenticate
           ? <AuthModal setKey={this.setKey.bind(this)} />
-          : <Dashboard flashMessage={this.flashMessage.bind(this)} />
+          : <Workspace flashMessage={this.flashMessage.bind(this)} />
         }
       </main>
     )

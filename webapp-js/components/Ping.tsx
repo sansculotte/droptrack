@@ -24,7 +24,7 @@ export default () => {
         height: '27px',
         borderRadius: '50%',
         backgroundColor: color,
-        transition: 'background-color 300ms ease-out',
+        transition: 'background-color 50ms ease-in, 300ms ease-out',
         float: 'right',
       }
     } />

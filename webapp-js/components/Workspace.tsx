@@ -6,6 +6,7 @@ import FileList from './FileList'
 
 import ApiResponse from 'interfaces/ApiResponse' 
 import File from 'interfaces/File'
+import Task from 'interfaces/Task'
 
 
 interface Props {
@@ -14,13 +15,14 @@ interface Props {
 
 interface State {
   files: Array<File>
+  tasks: Array<Task>
   message?: string
   url: string
   showFileList: boolean
 }
 
 
-class Dashboard extends React.Component<Props, State> {
+class Workspace extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props)
@@ -103,4 +105,4 @@ class Dashboard extends React.Component<Props, State> {
   }
 }
 
-export default Dashboard
+export default Workspace
