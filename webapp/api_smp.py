@@ -71,12 +71,24 @@ def process_create_pid_file(process, args):
     f.close()
     return filename
 
+############################################################
+# autoedit
+def autoedit_GET():
+    return api_response_ok({
+        'message': 'autoedit help',
+        'data': {
+            'name': 'autoedit',
+            'conf': autoedit_conf_default,
+        }
+    })
+
 def autoedit_POST():
     # request
     # configure and run autoedit
     autoedit_conf = kw2ns(autoedit_conf_default)
     current_app.logger.info(f'api_smp.autoedit_POST autoedit_conf_default {autoedit_conf}')
 
+    # request data copy to configuration
     request_data = request.json
     for k in autoedit_conf_default:
         k_req = f'{k}'
@@ -84,6 +96,8 @@ def autoedit_POST():
             v_req = request_data[k_req]
             setattr(autoedit_conf, k, v_req)
 
+    # configuration post-process
+    autoedit_conf.rootdir = g.user.home_directory
     autoedit_conf.filenames = [os.path.join(g.user.home_directory, filename) for filename in autoedit_conf.filenames]
     autoedit_conf.filename_export = autofilename(autoedit_conf)
             
@@ -111,23 +125,11 @@ def autoedit_POST():
             # input arguments
             'conf': ns2kw(autoedit_conf),
             # output returned
-            'result': {
-                'processhandle': processhandle,
-                'location': os.path.join(
-                    'data',
-                    os.path.basename(autoedit_conf.filename_export)
-                ),
-            },
-        }
-    })
-
-def autoedit_GET():
-    return api_response_ok({
-        'message': 'autoedit help',
-        'data': {
-            'name': 'autoedit',
-            'conf': autoedit_conf_default,
-            'result': {},
+            'processhandle': processhandle,
+            'location': os.path.join(
+                'data',
+                os.path.basename(autoedit_conf.filename_export)
+            ),
         }
     })
 
@@ -150,13 +152,12 @@ def autoedit() -> Response:
 def autocover_GET():
     return api_response_ok({
         'message': 'autocover help',
+        # output returned
         'data': {
             # function
             'name': 'autocover',
             # input arguments
             'conf': autocover_conf_default,
-            # output returned
-            'result': {},
         }
     })
 
@@ -165,6 +166,7 @@ def autocover_POST():
     autocover_conf = kw2ns(autocover_conf_default)
     current_app.logger.info(f'api_smp.autocover_POST autocover_conf_default {autocover_conf}')
 
+    # request data copy to configuration
     request_data = request.json
     for k in autocover_conf_default:
         k_req = f'{k}'
@@ -172,7 +174,10 @@ def autocover_POST():
             v_req = request_data[k_req]
             setattr(autocover_conf, k, v_req)
 
+    # configuration post-process
+    autocover_conf.rootdir = g.user.home_directory
     autocover_conf.filenames = [os.path.join(g.user.home_directory, filename) for filename in autocover_conf.filenames]
+    autocover_conf.filename_export = autofilename(autocover_conf)
             
     current_app.logger.info(f'api_smp.autocover_POST autocover_conf_request {autocover_conf}')
     
@@ -191,19 +196,31 @@ def autocover_POST():
     #     'message': 'autocover started',
     # })
 
-    res = main_autocover(autocover_conf)
-
-    return api_response_ok({
-        'message': 'autocover',
+    heavy_process = Process(
+        target=main_autocover,
+        args=[autocover_conf],
+        daemon=True,
+    )
+    heavy_process.start()
+    # create pid file in work dir
+    processhandle = process_create_pid_file(heavy_process, autocover_conf)
+    
+    # response
+    return api_response_started({
+        'message': 'autocover started',
+        # output returned
         'data': {
             # function
             'name': 'autocover',
             # input arguments
             'conf': ns2kw(autocover_conf),
-            # output returned
-            'result': res, 
+            'processhandle': processhandle,
+            'location': os.path.join(
+                os.path.basename(autocover_conf.filename_export)
+            ),
         }
     })
+
 
 @api_smp.route('/autocover', methods=['GET', 'POST'])
 def autocover() -> Response:
@@ -225,15 +242,12 @@ def automaster_GET():
     # location = ""
     return api_response_ok({
         'message': 'automaster help',
+        # output returned
         'data': {
             # function
             'name': 'automaster',
-            # input arguments
+            # input arguments as help
             'conf':automaster_conf_default,
-            # output returned
-            'result': {
-                # 'location': location,
-            }, 
         }
     })
 
@@ -242,7 +256,7 @@ def automaster_POST():
     automaster_conf = kw2ns(automaster_conf_default)
     current_app.logger.info(f'api_smp.automaster_POST automaster_conf_default {automaster_conf}')
 
-    # request data
+    # request data copy to configuration
     request_data = request.json
     for k in automaster_conf_default:
         k_req = f'{k}'
@@ -250,6 +264,8 @@ def automaster_POST():
             v_req = request_data[k_req]
             setattr(automaster_conf, k, v_req)
 
+    # configuration post-process
+    automaster_conf.rootdir = g.user.home_directory
     automaster_conf.filenames = [os.path.join(g.user.home_directory, filename) for filename in automaster_conf.filenames]
     automaster_conf.references = [os.path.join(g.user.home_directory, reference) for reference in automaster_conf.references]
     automaster_conf.filename_export = autofilename(automaster_conf)
@@ -262,25 +278,24 @@ def automaster_POST():
         daemon=True,
     )
     heavy_process.start()
-    # create pid file in work dir
+    
+    # TODO: create pid file in work dir by app context
     processhandle = process_create_pid_file(heavy_process, automaster_conf)
     
     # res = main_automaster(automaster_conf)
-    return api_response_ok({
-        'message': 'automaster result',
+    return api_response_started({
+        'message': 'automaster started',
+            # output returned
         'data': {
             # function
             'name': 'automaster',
             # input arguments
             'conf': ns2kw(automaster_conf),
-            # output returned
-            'result': {
-                'processhandle': processhandle,
-                'location': os.path.join(
-                    'data',
-                    os.path.basename(automaster_conf.filename_export)
-                ),
-            }
+            'processhandle': processhandle,
+            'location': os.path.join(
+                # 'data',
+                os.path.basename(automaster_conf.filename_export)
+            ),
         }
     })
 
@@ -299,14 +314,7 @@ def automaster() -> Response:
     return res
 
 
-# # async testing, define some heavy function
-# def my_func(**kwargs):
-#     import time
-#     current_app.logger.info(f"my_func Process start with {kwargs}")
-#     time.sleep(3)
-#     current_app.logger.info("my_func Process finished")
-
-# # get directory listings
+# # get directory tree listing
 # @api_smp.route('/files/<string:filename>', methods=['GET'])
 # def download(filename: str) -> Response:
 #     """
