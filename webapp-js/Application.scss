@@ -39,6 +39,12 @@ main.app {
     font-weight: 600;
     padding: 4px 4px 4px 4px;
   }
+  .backgroundRed {
+    background-color: #ff0000,
+  }
+  .backgroundBlack {
+    background-color: #000000,
+  }
 }
 
 @media screen and (max-width: 37.5em) {

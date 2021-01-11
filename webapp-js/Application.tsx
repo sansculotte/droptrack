@@ -4,6 +4,8 @@ import AuthModal from 'components/AuthModal'
 import Dashboard from 'components/Dashboard'
 import ExpireMessage from 'components/ExpireMessage'
 
+import Ping from 'components/Ping'
+
 import * as style from './Application.scss'
 
 
@@ -36,7 +38,7 @@ class Application extends React.Component<Props, State> {
   public render() {
     return (
       <main className={style.app}>
-        <h1>Droptrack</h1>
+        <h1>Droptrack<Ping /></h1>
         {this.state.message &&
           <ExpireMessage delay={2000}>{this.state.message}</ExpireMessage>
         }
