@@ -71,6 +71,9 @@ def process_create_pid_file(process, args):
     f.close()
     return filename
 
+def input_filenames_exist(filenames):
+    return [os.path.join(g.user.home_directory, filename) for filename in filenames if os.path.exists(os.path.join(g.user.home_directory, filename))]
+
 ############################################################
 # autoedit
 def autoedit_GET():
@@ -98,7 +101,7 @@ def autoedit_POST():
 
     # configuration post-process
     autoedit_conf.rootdir = g.user.home_directory
-    autoedit_conf.filenames = [os.path.join(g.user.home_directory, filename) for filename in autoedit_conf.filenames]
+    autoedit_conf.filenames = input_filenames_exist(autoedit_conf.filenames)
     autoedit_conf.filename_export = autofilename(autoedit_conf)
             
     current_app.logger.info(f'api_smp.autoedit_POST autoedit_conf_request {autoedit_conf}')
@@ -127,7 +130,6 @@ def autoedit_POST():
             # output returned
             'processhandle': processhandle,
             'location': os.path.join(
-                'data',
                 os.path.basename(autoedit_conf.filename_export)
             ),
         }
@@ -176,7 +178,7 @@ def autocover_POST():
 
     # configuration post-process
     autocover_conf.rootdir = g.user.home_directory
-    autocover_conf.filenames = [os.path.join(g.user.home_directory, filename) for filename in autocover_conf.filenames]
+    autocover_conf.filenames = input_filenames_exist(autocover_conf.filenames)
     autocover_conf.filename_export = autofilename(autocover_conf)
             
     current_app.logger.info(f'api_smp.autocover_POST autocover_conf_request {autocover_conf}')
@@ -266,11 +268,17 @@ def automaster_POST():
 
     # configuration post-process
     automaster_conf.rootdir = g.user.home_directory
-    automaster_conf.filenames = [os.path.join(g.user.home_directory, filename) for filename in automaster_conf.filenames]
-    automaster_conf.references = [os.path.join(g.user.home_directory, reference) for reference in automaster_conf.references]
-    automaster_conf.filename_export = autofilename(automaster_conf)
+    automaster_conf.filenames = input_filenames_exist(automaster_conf.filenames) # [os.path.join(g.user.home_directory, filename) for filename in automaster_conf.filenames]
+    automaster_conf.references = input_filenames_exist(automaster_conf.references) # [os.path.join(g.user.home_directory, reference) for reference in automaster_conf.references]
     
     current_app.logger.info(f'api_smp.automaster_POST automaster_conf_request {automaster_conf}')
+
+    if len(automaster_conf.filenames) < 1:
+        return api_response_error({
+            'message': 'no input file found',
+        })
+    
+    automaster_conf.filename_export = autofilename(automaster_conf)
     
     heavy_process = Process(
         target=main_automaster,
