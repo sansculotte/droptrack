@@ -36,7 +36,7 @@ def authenticate() -> Optional[Response]:
     verify token, bind user to request global
     """
     token = request.headers.get('X-Authentication')
-    current_app.logger.info(f'api.authenticate token = {token}')
+    # current_app.logger.info(f'api.authenticate token = {token}')
     if token:
         g.user = User.find_by_api_key(token)
         if g.user:
@@ -72,7 +72,7 @@ def process_create_pid_file(process, args):
     return filename
 
 def input_filenames_exist(filenames):
-    return [os.path.join(g.user.home_directory, filename) for filename in filenames if os.path.exists(os.path.join(g.user.home_directory, filename))]
+    return [os.path.join(g.user.home_directory, os.path.basename(filename)) for filename in filenames if os.path.exists(os.path.join(g.user.home_directory, os.path.basename(filename)))]
 
 ############################################################
 # autoedit
@@ -130,8 +130,11 @@ def autoedit_POST():
             # output returned
             'processhandle': processhandle,
             'location': os.path.join(
-                os.path.basename(autoedit_conf.filename_export)
+                os.path.basename(autoedit_conf.filename_export + '.wav')
             ),
+            'locations': [os.path.join(
+                os.path.basename(autoedit_conf.filename_export + output_type)
+            ) for output_type in autoedit_conf.outputs],
         }
     })
 
@@ -218,8 +221,11 @@ def autocover_POST():
             'conf': ns2kw(autocover_conf),
             'processhandle': processhandle,
             'location': os.path.join(
-                os.path.basename(autocover_conf.filename_export)
+                os.path.basename(autocover_conf.filename_export) + '.json'
             ),
+            'locations': [os.path.join(
+                os.path.basename(autocover_conf.filename_export + output_type)
+            ) for output_type in autocover_conf.outputs],
         }
     })
 
@@ -256,7 +262,6 @@ def automaster_GET():
 def automaster_POST():
     # configure and run automaster
     automaster_conf = kw2ns(automaster_conf_default)
-    current_app.logger.info(f'api_smp.automaster_POST automaster_conf_default {automaster_conf}')
 
     # request data copy to configuration
     request_data = request.json
@@ -266,6 +271,8 @@ def automaster_POST():
             v_req = request_data[k_req]
             setattr(automaster_conf, k, v_req)
 
+    current_app.logger.info(f'api_smp.automaster_POST automaster_conf {automaster_conf}')
+    
     # configuration post-process
     automaster_conf.rootdir = g.user.home_directory
     automaster_conf.filenames = input_filenames_exist(automaster_conf.filenames) # [os.path.join(g.user.home_directory, filename) for filename in automaster_conf.filenames]
@@ -302,8 +309,11 @@ def automaster_POST():
             'processhandle': processhandle,
             'location': os.path.join(
                 # 'data',
-                os.path.basename(automaster_conf.filename_export)
+                os.path.basename(automaster_conf.filename_export) + '.wav'
             ),
+            'locations': [os.path.join(
+                os.path.basename(automaster_conf.filename_export + output_type)
+            ) for output_type in automaster_conf.outputs],
         }
     })
 

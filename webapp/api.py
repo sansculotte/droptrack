@@ -30,7 +30,7 @@ def authenticate() -> Optional[Response]:
     verify token, bind user to request global
     """
     token = request.headers.get('X-Authentication')
-    current_app.logger.info(f'api.authenticate token = {token}')
+    # current_app.logger.info(f'api.authenticate token = {token}')
     if token:
         g.user = User.find_by_api_key(token)
         if g.user:
@@ -85,7 +85,11 @@ def url() -> Response:
         )
         db.session.add(task)
         db.session.commit()
-        current_app.queue.send(url)
+        try:
+            current_app.queue.send(url)
+        except Exception as e:
+            current_app.logger.info(f'Queue unavailable')
+            
         return api_response_accepted(
             {'message': 'Url accepted', 'task': task.to_dict()},
             location=task.url
@@ -129,7 +133,10 @@ def upload() -> Response:
         )
         soundfile.save(location)
         url = url_for('api.download', filename=filename, _external=True)
-        current_app.queue.send(url)
+        try:
+            current_app.queue.send(url)
+        except Exception as e:
+            current_app.logger.info(f'Queue unavailable')
         return api_response_ok({'message': 'File accepted'})
     else:
         return api_response_error({'message': 'Invalid File'})
