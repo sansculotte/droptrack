@@ -102,9 +102,13 @@ class Task(db.Model):
         otherwise the task url
         """
         if self.result_location:
-            return url_for('api.download', path=self.result_location)
+            return url_for(
+                'api.download_file',
+                filename=self.result_location,
+                _external=True
+            )
         else:
-            return url_for('api.show_task', uuid=self.uuid)
+            return url_for('api.show_task', uuid=self.uuid, _external=True)
 
     @property
     def is_processing(self):
@@ -130,6 +134,6 @@ class Task(db.Model):
         return {
             'name': self.name,
             'uuid': str(self.uuid),
-            'result': self.url,
+            'url': self.url,
             'status': self.status.name
         }

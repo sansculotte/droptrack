@@ -1,5 +1,7 @@
 from typing import Optional, Union
 import os
+from werkzeug.utils import secure_filename
+from multiprocessing import Process
 from flask import (
     g,
     current_app,
@@ -11,12 +13,12 @@ from flask import (
     Response,
 )
 from .models import db
-from werkzeug.utils import secure_filename
 from .lib.helpers import (
     validate_url,
     validate_soundfile,
 )
 from .models import User, Task
+from .downloader import download
 """
 The main mechanics of the webapp.
 """
@@ -79,7 +81,13 @@ def url() -> Response:
         )
         db.session.add(task)
         db.session.commit()
-        current_app.queue.send(url)
+
+        thread = Process(
+            target=download,
+            args=(url, task.id, g.user.home_directory)
+        )
+        thread.start()
+
         return api_response_accepted(
             {'message': 'Url accepted', 'task': task.to_dict()},
             location=task.url
@@ -102,7 +110,7 @@ def list_files() -> Response:
 
 
 @api.route('/files', methods=['POST'])
-def upload() -> Response:
+def upload_file() -> Response:
     """
     Accept direct soundfile upload per multipart/form-data
     """
@@ -122,7 +130,7 @@ def upload() -> Response:
             filename
         )
         soundfile.save(location)
-        url = url_for('api.download', filename=filename, _external=True)
+        url = url_for('api.download_file', filename=filename, _external=True)
         current_app.queue.send(url)
         return api_response_ok({'message': 'File accepted'})
     else:
@@ -130,7 +138,7 @@ def upload() -> Response:
 
 
 @api.route('/files/<path:filename>', methods=['GET'])
-def download(filename: str) -> Response:
+def download_file(filename: str) -> Response:
     """
     Retrieve stored file
     """
