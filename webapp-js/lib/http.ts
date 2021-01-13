@@ -26,12 +26,7 @@ async function request(
   })
   const credentials = 'same-origin'
   const response = await fetch(url, { body, method, headers, mode, credentials })
-  if (response.ok) {
-    const json = await response.json()
-    return json
-  }
-  // return data anyway
-  return await response.json()
+  return response
 }
 
 async function get(path: string, params?:Array<[string, string]>) {
@@ -39,15 +34,18 @@ async function get(path: string, params?:Array<[string, string]>) {
   if (params) {
     url.search = new URLSearchParams(params).toString()
   }
-  return request(url.toString(), 'GET')
+  const response = await request(url.toString(), 'GET')
+  return await response.json()
 }
 
 async function put(path: string, data: ApiData) {
-  return request(apiUrl(path), 'PUT', JSON.stringify(data))
+  const response = await request(apiUrl(path), 'PUT', JSON.stringify(data))
+  return await response.json()
 }
 
 async function post(path: string, data: ApiData) {
-  return request(apiUrl(path), 'POST', JSON.stringify(data))
+  const response = await request(apiUrl(path), 'POST', JSON.stringify(data))
+  return await response.json()
 }
 
 async function upload(path: string, file: any, fieldname: string='file') {
@@ -57,12 +55,34 @@ async function upload(path: string, file: any, fieldname: string='file') {
   })
   const body = new FormData()
   body.append(fieldname, file)
-  return request(apiUrl(path), 'POST', body, headers)
+  const response = await request(apiUrl(path), 'POST', body, headers)
+  return await response.json()
+}
+
+async function poll(path: string) {
+  const response = await request(apiUrl(path), 'GET')
+  const data = await response.json()
+  if (response.status === 202) {
+    data.status = 'processing'
+    data.url = response.headers.get('Location')
+  }
+  else if (response.status === 201) {
+    data.status = 'done'
+    data.url = response.headers.get('Location')
+  }
+  else if (response.status === 200) {
+    data.status = 'done'
+  }
+  else {
+    data.status = 'error'
+  }
+  return data
 }
 
 export default {
   get,
   put,
   post,
-  upload
+  upload,
+  poll
 }

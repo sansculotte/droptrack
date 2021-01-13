@@ -11,6 +11,9 @@ interface Props {
   flashMessage: (message: string) => void 
 }
 
+const activeTasks = (tasks: Map<string, Task>) =>
+    new Map([...tasks].filter(([_, t]) => t.status === 'processing'))
+
 export default (props: Props) => {
 
   const [ color, setColor ] = useState('#000')
@@ -22,8 +25,8 @@ export default (props: Props) => {
 
   const pollTasks = async () => {
     const { tasks } = props
-    tasks.forEach(async (t) => {
-        const response = await http.get(`/tasks/${t.uuid}`)
+    activeTasks(tasks).forEach(async (t) => {
+        const response = await http.poll(`/tasks/${t.uuid}`)
         const task = response.data
         if (task.status === 'done') {
           props.flashMessage(`Task ${task.name} has finished!`)
@@ -55,6 +58,6 @@ export default (props: Props) => {
             left: '50%',
             top: '50%'
         }
-    }>{props.tasks.size}</div></div>
+    }>{activeTasks(props.tasks).size}</div></div>
   )
 }
