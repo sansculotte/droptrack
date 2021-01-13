@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 import os
 from flask import (
     g,
@@ -10,12 +10,13 @@ from flask import (
     Blueprint,
     Response,
 )
+from .models import db
 from werkzeug.utils import secure_filename
 from .lib.helpers import (
     validate_url,
     validate_soundfile,
 )
-from .models import User
+from .models import User, Task
 """
 The main mechanics of the webapp.
 """
@@ -37,13 +38,28 @@ def authenticate() -> Optional[Response]:
     return not_authorized()
 
 
-def not_authorized(error=None, message='not authorized') -> Response:
+def not_found(message='not found'):
+    return api_response_error({'message': message}, status=404)
+
+
+def not_authorized(message='not authorized') -> Response:
     return api_response_error({'message': message}, status=403)
 
 
-def api_response_ok(data: dict, status: int = 200) -> Response:
-    data.update({'status': 'ok'})
-    return Response(json.dumps(data), status=status)
+def api_response_ok(data: Union[dict, list], status: int = 200) -> Response:
+    rv = {'status': 'ok', 'data': data}
+    return Response(json.dumps(rv), status=status)
+
+
+def api_response_accepted(data: Union[dict, list], location: str) -> Response:
+    """
+    Send a 202 Accepted Response with a link to the status resource
+    in the Location header
+    """
+    rv = {'status': 'accepted', 'data': data}
+    response = Response(json.dumps(rv), status=202)
+    response.headers['Location'] = location
+    return response
 
 
 def api_response_started(data: dict, status: int = 202) -> Response:
@@ -52,24 +68,30 @@ def api_response_started(data: dict, status: int = 202) -> Response:
 
 
 def api_response_error(data: dict, status: int = 400) -> Response:
-    data.update({'status': 'error'})
-    return Response(json.dumps(data), status=status)
+    rv = {'status': 'error', 'data': data}
+    return Response(json.dumps(rv), status=status)
 
 
 @api.route('/url', methods=['POST'])
 def url() -> Response:
     """
-    Accept soundfile url
+    Accept soundfile url, download in the background
     """
-    # TODO: requires server/player to be up to do the actual download
-    if request.method == 'POST':
-        url = request.json.get('url')
-        if validate_url(url):
-            current_app.queue.send(url)
-            return api_response_ok({'message': 'Url accepted'})
-        else:
-            return api_response_error({'message': 'Invalid url'})
-    return Response(status=405)
+    url = request.json.get('url')
+    if validate_url(url):
+        task = Task(
+            name='url download',
+            user=g.user,
+        )
+        db.session.add(task)
+        db.session.commit()
+        current_app.queue.send(url)
+        return api_response_accepted(
+            {'message': 'Url accepted', 'task': task.to_dict()},
+            location=task.url
+        )
+    else:
+        return api_response_error({'message': 'Invalid url'})
 
 
 @api.route('/files', methods=['GET'])
@@ -137,3 +159,33 @@ def delete_file(filename: str) -> Response:
     )
     os.unlink(location)
     return api_response_ok({'message': 'file deleted'})
+
+
+@api.route('/tasks')
+def list_tasks():
+    """
+    Task List
+    """
+    return api_response_ok({
+        'data': [
+            t.to_dict() for t in g.user.tasks
+        ]
+    })
+
+
+@api.route('/tasks/<uuid:uuid>')
+def show_task(uuid):
+    """
+    Task details and status 202 if still processing
+    """
+    task = Task.query.filter(
+        Task.uuid == uuid,
+        Task.user_id == g.user.id
+    ).first()
+
+    if task:
+        if task.is_done:
+            return api_response_ok(task.to_dict())
+        if task.is_processing:
+            return api_response_accepted(task.to_dict(), location=task.url)
+    return not_found()
