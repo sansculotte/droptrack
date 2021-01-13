@@ -10,7 +10,6 @@ import TaskPoll from './TaskPoll'
 import ApiResponse from 'interfaces/ApiResponse'
 import File from 'interfaces/File'
 import Task from 'interfaces/Task'
-import Transformation from 'interfaces/Transformation'
 
 
 interface Props {
@@ -23,7 +22,6 @@ interface State {
   lastUpdate: number
   message?: string
   tasks: Map<string, Task>
-  transformations: Array<Transformation>
 }
 
 
@@ -35,7 +33,6 @@ class Workspace extends React.Component<Props, State> {
       files: [],
       tasks: new Map(),
       lastUpdate: new Date().getTime(),
-      transformations: [],
       activeWidget: 'drop'
     }
   }
