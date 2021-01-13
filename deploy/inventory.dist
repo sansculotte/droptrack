@@ -1,0 +1,2 @@
+[droptrack]
+    droptrack ansible_connection=ssh ansible_host=droptrack.sansculotte.net ansible_user=deploy ansible_python_interpreter=/usr/local/bin/python
