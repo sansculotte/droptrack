@@ -133,7 +133,7 @@ def autoedit_POST():
                 os.path.basename(autoedit_conf.filename_export + '.wav')
             ),
             'locations': [os.path.join(
-                os.path.basename(autoedit_conf.filename_export + output_type)
+                os.path.basename(autoedit_conf.filename_export + '.' + output_type)
             ) for output_type in autoedit_conf.outputs],
         }
     })
@@ -224,7 +224,7 @@ def autocover_POST():
                 os.path.basename(autocover_conf.filename_export) + '.json'
             ),
             'locations': [os.path.join(
-                os.path.basename(autocover_conf.filename_export + output_type)
+                os.path.basename(autocover_conf.filename_export + '.' + output_type)
             ) for output_type in autocover_conf.outputs],
         }
     })
@@ -312,7 +312,7 @@ def automaster_POST():
                 os.path.basename(automaster_conf.filename_export) + '.wav'
             ),
             'locations': [os.path.join(
-                os.path.basename(automaster_conf.filename_export + output_type)
+                os.path.basename(automaster_conf.filename_export + '.' + output_type)
             ) for output_type in automaster_conf.outputs],
         }
     })
