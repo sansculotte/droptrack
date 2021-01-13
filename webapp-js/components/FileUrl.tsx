@@ -3,9 +3,11 @@ import * as React from 'react'
 import { useState } from 'react'
 
 import ApiResponse from 'interfaces/ApiResponse' 
+import Task from 'interfaces/Task'
 
 interface Props {
   flashMessage: (message: string) => void 
+  addTask: (task: Task) => void
 }
 
 export default (props: Props) => {
@@ -19,8 +21,9 @@ export default (props: Props) => {
   const handleDropUrl = (ev: React.MouseEvent) => {
     ev.preventDefault()
     http.post('/url', {url}).then((response: ApiResponse) => {
-      console.log(response)
-      props.flashMessage(response.message)
+      const { message, task } = response.data
+      props.addTask(task)
+      props.flashMessage(message)
     }).catch(console.error)
   }
 

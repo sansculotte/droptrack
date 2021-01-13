@@ -1,25 +1,23 @@
 import * as React from 'react'
-import { useState } from 'react'
-import { useInterval } from 'hooks/useInterval'
+import { useEffect, useState } from 'react'
 
 
-export default () => {
+export default (props: {timeStamp: number}) => {
 
   const [ color, setColor ] = useState('#000')
 
   const ping = () => {
-//    setColor(`#${randomByte()}${randomByte()}${randomByte()}`)
     setColor('#ac0000')
     setTimeout(() => setColor('#000000'), 200)
   }
 
-  useInterval(ping, 1000)
+  useEffect(ping, [props.timeStamp])
 
   return (
     <div style={
       {
-        width: '27px',
-        height: '27px',
+        width: '50px',
+        height: '50px',
         borderRadius: '50%',
         backgroundColor: color,
         transition: 'background-color 50ms ease-in, 300ms ease-out',

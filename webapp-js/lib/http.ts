@@ -30,6 +30,7 @@ async function request(
     const json = await response.json()
     return json
   }
+  // return data anyway
   return await response.json()
 }
 

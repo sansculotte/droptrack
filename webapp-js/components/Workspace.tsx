@@ -4,10 +4,13 @@ import http from 'lib/http'
 import FileDrop from './FileDrop'
 import FileList from './FileList'
 import FileUrl from './FileUrl'
+import TaskList from './TaskList'
+import TaskPoll from './TaskPoll'
 
 import ApiResponse from 'interfaces/ApiResponse'
 import File from 'interfaces/File'
 import Task from 'interfaces/Task'
+import Transformation from 'interfaces/Transformation'
 
 
 interface Props {
@@ -15,10 +18,12 @@ interface Props {
 }
 
 interface State {
+  activeWidget: 'drop' | 'files' | 'tasks'
   files: Array<File>
-  tasks: Array<Task>
+  lastUpdate: number
   message?: string
-  showFileList: boolean
+  tasks: Map<string, Task>
+  transformations: Array<Transformation>
 }
 
 
@@ -28,8 +33,10 @@ class Workspace extends React.Component<Props, State> {
     super(props)
     this.state = {
       files: [],
-      tasks: [],
-      showFileList: false,
+      tasks: new Map(),
+      lastUpdate: new Date().getTime(),
+      transformations: [],
+      activeWidget: 'drop'
     }
   }
 
@@ -40,19 +47,27 @@ class Workspace extends React.Component<Props, State> {
   render() {
     return (
       <div>
-
-        <form>
-          <FileUrl flashMessage={this.props.flashMessage} />
-          <FileDrop accept="audio/*" onDrop={this.handleDropFile.bind(this)} />
-        </form>
-        {this.state.showFileList
-          ? <>
-              <input type="button" onClick={this.hideFileList.bind(this)} value="Hide Files" />
-              <FileList files={this.state.files} />
-            </>
-          : <input type="button" onClick={this.showFileList.bind(this)} value="Show Files"/>
+        <menu>
+          <input type="button" onClick={this.hideAll.bind(this)} value="Drop" />
+          <input type="button" onClick={this.showFileList.bind(this)} value="Files" />
+          <input type="button" onClick={this.showTasks.bind(this)} value="Tasks" />
+          <TaskPoll
+            tasks={this.state.tasks}
+            updateTasks={this.updateTasks.bind(this)}
+            flashMessage={this.props.flashMessage}
+          />
+        </menu>
+        {this.state.activeWidget === 'files'
+          && <FileList files={this.state.files} />
         }
-      </div>
+        {this.state.activeWidget === 'tasks'
+          && <TaskList tasks={this.state.tasks} />
+        }
+        <form>
+          <FileDrop accept="audio/*" onDrop={this.handleDropFile.bind(this)} />
+          <FileUrl addTask={this.addTask.bind(this)} flashMessage={this.props.flashMessage} />
+        </form>
+     </div>
     )
   }
 
@@ -69,19 +84,34 @@ class Workspace extends React.Component<Props, State> {
     }
   }
 
-  showFileList() {
-    this.setState({showFileList: true}, () => this.loadFileList())
+  hideAll() {
+    this.setState({activeWidget: 'drop'})
   }
 
-  hideFileList() {
-    this.setState({showFileList: false})
+  showFileList() {
+    this.setState({activeWidget: 'files'}, () => this.loadFileList())
+  }
+
+  showTasks() {
+    this.setState({activeWidget: 'tasks'})
+  }
+
+  addTask(task: Task) {
+    const { tasks } = this.state
+    tasks.set(task.uuid, task)
+    this.setState({ tasks })
+ }
+
+  updateTasks(tasks: Map<string, Task>) {
+    const lastUpdate = new Date().getTime()
+    this.setState({tasks, lastUpdate})
   }
 
   async loadFileList() {
     const response = await http.get('/files')
     if (response.status === 'ok') {
-      const { files } = response
-      this.setState({files})
+      const { files } = response.data
+      this.setState({ files })
     }
   }
 }
