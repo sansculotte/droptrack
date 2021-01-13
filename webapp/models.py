@@ -114,6 +114,15 @@ class Task(db.Model):
     def is_done(self):
         return self.status == Status.done
 
+    def set_done(self, result_location: Optional[str] = None):
+        """
+        Resolve task, optionally set path to result file
+        """
+        self.result_location = result_location
+        self.status = Status.done
+        db.session.add(self)
+        db.session.commit()
+
     def to_dict(self):
         """
         Export for JSON serializer
