@@ -4,6 +4,9 @@ main.app {
   width: 600px;
   padding: 0;
   font-family: Helvetica, sans-serif;
+  a {
+    text-decoration: none;
+  }
   h1 {
     padding: 10px;
     background-color: #444444;
