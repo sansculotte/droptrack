@@ -1,0 +1,15 @@
+ul.taskList {
+  & > li {
+    &:hover {
+      background-color: #f479b3;
+    }
+    display: flex;
+    dt {
+      width: 80%;
+    }
+    dd {
+      margin: 0;
+      width: 20%;
+    }
+  }
+}
