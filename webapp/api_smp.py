@@ -22,7 +22,7 @@ from multiprocessing import Process
 
 from .smp_audio_tasks import autofilename
 from .smp_audio_tasks import ns2kw, kw2ns
-from .smp_audio_tasks import run_autoedit_2, autoedit_conf_default
+from .smp_audio_tasks import main_autoedit, autoedit_conf_default
 from .smp_audio_tasks import main_autocover, autocover_conf_default
 from .smp_audio_tasks import main_automaster, automaster_conf_default
 
@@ -106,37 +106,46 @@ def autoedit_POST():
             
     current_app.logger.info(f'api_smp.autoedit_POST autoedit_conf_request {autoedit_conf}')
     
+    task = Task(
+        name=os.path.basename(autoedit_conf.filename_export),
+        user=g.user,
+    )
+    db.session.add(task)
+    db.session.commit()
+
     # function map request
-    # create process with computation = heavy 
-    # heavy = anything taking more than a few seconds
     async_process = Process(
-        target=run_autoedit_2, # my_func
-        kwargs={
-            'autoedit_conf': autoedit_conf,
-        },
+        target=main_autoedit,
+        args=[autoedit_conf],
+        kwargs={'task': task},
         daemon=True,
     )
     async_process.start()
     # create pid file in work dir
     # processhandle = process_create_pid_file(async_process, autoedit_conf)
     # response
-    return api_response_started({
-        'message': 'autoedit started',
-        'data': {
-            # function
-            'name': 'autoedit',
-            # input arguments
-            'conf': ns2kw(autoedit_conf),
-            # output returned
-            # 'processhandle': processhandle,
-            'location': os.path.join(
-                os.path.basename(autoedit_conf.filename_export + '.wav')
-            ),
-            'locations': [os.path.join(
-                os.path.basename(autoedit_conf.filename_export + '.' + output_type)
-            ) for output_type in autoedit_conf.outputs],
-        }
-    })
+    return api_response_accepted(
+        {'message': 'autoedit accepted', 'task': task.to_dict()},
+        location=task.url
+    )
+
+    # return api_response_started({
+    #     'message': 'autoedit started',
+    #     'data': {
+    #         # function
+    #         'name': 'autoedit',
+    #         # input arguments
+    #         'conf': ns2kw(autoedit_conf),
+    #         # output returned
+    #         # 'processhandle': processhandle,
+    #         'location': os.path.join(
+    #             os.path.basename(autoedit_conf.filename_export + '.wav')
+    #         ),
+    #         'locations': [os.path.join(
+    #             os.path.basename(autoedit_conf.filename_export + '.' + output_type)
+    #         ) for output_type in autoedit_conf.outputs],
+    #     }
+    # })
 
 @api_smp.route('/autoedit', methods=['GET', 'POST'])
 def autoedit() -> Response:
@@ -186,24 +195,17 @@ def autocover_POST():
             
     current_app.logger.info(f'api_smp.autocover_POST autocover_conf_request {autocover_conf}')
     
-    # Create a process with "heavy" computation
-    # anything taking more than a few seconds
-    # async_process = Process(
-    #     target=main_autocover, # my_func
-    #     args=[autocover_conf],
-    #     # kwargs={
-    #     #     'autocover_conf': autocover_conf,
-    #     # },
-    #     daemon=True,
-    # )
-    # async_process.start()
-    # return api_response_started({
-    #     'message': 'autocover started',
-    # })
+    task = Task(
+        name=os.path.basename(autocover_conf.filename_export),
+        user=g.user,
+    )
+    db.session.add(task)
+    db.session.commit()
 
     async_process = Process(
         target=main_autocover,
         args=[autocover_conf],
+        kwargs={'task': task},
         daemon=True,
     )
     async_process.start()
@@ -211,23 +213,28 @@ def autocover_POST():
     # processhandle = process_create_pid_file(async_process, autocover_conf)
     
     # response
-    return api_response_started({
-        'message': 'autocover started',
-        # output returned
-        'data': {
-            # function
-            'name': 'autocover',
-            # input arguments
-            'conf': ns2kw(autocover_conf),
-            # 'processhandle': processhandle,
-            'location': os.path.join(
-                os.path.basename(autocover_conf.filename_export) + '.json'
-            ),
-            'locations': [os.path.join(
-                os.path.basename(autocover_conf.filename_export + '.' + output_type)
-            ) for output_type in autocover_conf.outputs],
-        }
-    })
+    return api_response_accepted(
+        {'message': 'autoedit accepted', 'task': task.to_dict()},
+        location=task.url
+    )
+
+    # return api_response_started({
+    #     'message': 'autocover started',
+    #     # output returned
+    #     'data': {
+    #         # function
+    #         'name': 'autocover',
+    #         # input arguments
+    #         'conf': ns2kw(autocover_conf),
+    #         # 'processhandle': processhandle,
+    #         'location': os.path.join(
+    #             os.path.basename(autocover_conf.filename_export) + '.json'
+    #         ),
+    #         'locations': [os.path.join(
+    #             os.path.basename(autocover_conf.filename_export + '.' + output_type)
+    #         ) for output_type in autocover_conf.outputs],
+    #     }
+    # })
 
 
 @api_smp.route('/autocover', methods=['GET', 'POST'])
@@ -287,9 +294,8 @@ def automaster_POST():
     
     automaster_conf.filename_export = autofilename(automaster_conf)
     
-    # TODO: create pid file in work dir by app context
     task = Task(
-        name='automaster',
+        name=os.path.basename(automaster_conf.filename_export),
         user=g.user,
     )
     db.session.add(task)
@@ -310,7 +316,6 @@ def automaster_POST():
         {'message': 'automaster accepted', 'task': task.to_dict()},
         location=task.url
     )
-
 
     #     # output returned
     #     'data': {
