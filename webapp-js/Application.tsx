@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import AuthModal from 'components/AuthModal'
-import Dashboard from 'components/Dashboard'
+import Workspace from 'components/Workspace'
 import ExpireMessage from 'components/ExpireMessage'
 
 import * as style from './Application.scss'
@@ -38,11 +38,14 @@ class Application extends React.Component<Props, State> {
       <main className={style.app}>
         <h1>Droptrack</h1>
         {this.state.message &&
-          <ExpireMessage delay={2000}>{this.state.message}</ExpireMessage>
+          <ExpireMessage
+            delay={2000}
+            timeStamp={new Date().getTime()}
+          >{this.state.message}</ExpireMessage>
         }
         {this.state.authenticate
           ? <AuthModal setKey={this.setKey.bind(this)} />
-          : <Dashboard flashMessage={this.flashMessage.bind(this)} />
+          : <Workspace flashMessage={this.flashMessage.bind(this)} />
         }
       </main>
     )

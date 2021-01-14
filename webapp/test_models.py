@@ -1,6 +1,7 @@
 import mock
+from uuid import uuid4
 from .test_base import BaseTestCase
-from .models import User
+from .models import User, Task, Status
 
 
 class UserModelTest(BaseTestCase):
@@ -20,3 +21,14 @@ class UserModelTest(BaseTestCase):
         assert user.email == email
         assert user.check_password(password)
         assert m.call_count == 1
+
+
+class TaskModelTest(BaseTestCase):
+
+    def test_task_model(self):
+        user = User(name='name')
+        task = Task(name='test', user=user, uuid=uuid4())
+        assert task.user == user
+        assert task in user.tasks
+        assert str(task.uuid) in task.url
+        assert task.status == Status.processing
