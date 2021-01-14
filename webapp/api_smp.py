@@ -14,7 +14,8 @@ from flask import (
     Blueprint,
     Response,
 )
-from .models import User
+from .models import db
+from .models import User, Task
 from .filesys import walkdirlist
 
 from multiprocessing import Process
@@ -26,7 +27,7 @@ from .smp_audio_tasks import main_autocover, autocover_conf_default
 from .smp_audio_tasks import main_automaster, automaster_conf_default
 
 from .api import authenticate, not_authorized
-from .api import api_response_ok, api_response_started, api_response_error
+from .api import api_response_ok, api_response_accepted, api_response_error
 
 api_smp = Blueprint('api/smp', __name__)
 
@@ -86,8 +87,7 @@ def autoedit_GET():
     })
 
 def autoedit_POST():
-    # request
-    # configure and run autoedit
+    # request configure and run autoedit
     autoedit_conf = kw2ns(autoedit_conf_default)
     current_app.logger.info(f'api_smp.autoedit_POST autoedit_conf_default {autoedit_conf}')
 
@@ -109,16 +109,16 @@ def autoedit_POST():
     # function map request
     # create process with computation = heavy 
     # heavy = anything taking more than a few seconds
-    heavy_process = Process(
+    async_process = Process(
         target=run_autoedit_2, # my_func
         kwargs={
             'autoedit_conf': autoedit_conf,
         },
         daemon=True,
     )
-    heavy_process.start()
+    async_process.start()
     # create pid file in work dir
-    processhandle = process_create_pid_file(heavy_process, autoedit_conf)
+    # processhandle = process_create_pid_file(async_process, autoedit_conf)
     # response
     return api_response_started({
         'message': 'autoedit started',
@@ -128,7 +128,7 @@ def autoedit_POST():
             # input arguments
             'conf': ns2kw(autoedit_conf),
             # output returned
-            'processhandle': processhandle,
+            # 'processhandle': processhandle,
             'location': os.path.join(
                 os.path.basename(autoedit_conf.filename_export + '.wav')
             ),
@@ -188,7 +188,7 @@ def autocover_POST():
     
     # Create a process with "heavy" computation
     # anything taking more than a few seconds
-    # heavy_process = Process(
+    # async_process = Process(
     #     target=main_autocover, # my_func
     #     args=[autocover_conf],
     #     # kwargs={
@@ -196,19 +196,19 @@ def autocover_POST():
     #     # },
     #     daemon=True,
     # )
-    # heavy_process.start()
+    # async_process.start()
     # return api_response_started({
     #     'message': 'autocover started',
     # })
 
-    heavy_process = Process(
+    async_process = Process(
         target=main_autocover,
         args=[autocover_conf],
         daemon=True,
     )
-    heavy_process.start()
+    async_process.start()
     # create pid file in work dir
-    processhandle = process_create_pid_file(heavy_process, autocover_conf)
+    # processhandle = process_create_pid_file(async_process, autocover_conf)
     
     # response
     return api_response_started({
@@ -219,7 +219,7 @@ def autocover_POST():
             'name': 'autocover',
             # input arguments
             'conf': ns2kw(autocover_conf),
-            'processhandle': processhandle,
+            # 'processhandle': processhandle,
             'location': os.path.join(
                 os.path.basename(autocover_conf.filename_export) + '.json'
             ),
@@ -287,35 +287,47 @@ def automaster_POST():
     
     automaster_conf.filename_export = autofilename(automaster_conf)
     
-    heavy_process = Process(
+    # TODO: create pid file in work dir by app context
+    task = Task(
+        name='automaster',
+        user=g.user,
+    )
+    db.session.add(task)
+    db.session.commit()
+
+    async_process = Process(
         target=main_automaster,
         args=[automaster_conf],
+        kwargs={'task': task},
         daemon=True,
     )
-    heavy_process.start()
+    async_process.start()
     
-    # TODO: create pid file in work dir by app context
-    processhandle = process_create_pid_file(heavy_process, automaster_conf)
+    # processhandle = process_create_pid_file(async_process, automaster_conf)
     
     # res = main_automaster(automaster_conf)
-    return api_response_started({
-        'message': 'automaster started',
-            # output returned
-        'data': {
-            # function
-            'name': 'automaster',
-            # input arguments
-            'conf': ns2kw(automaster_conf),
-            'processhandle': processhandle,
-            'location': os.path.join(
-                # 'data',
-                os.path.basename(automaster_conf.filename_export) + '.wav'
-            ),
-            'locations': [os.path.join(
-                os.path.basename(automaster_conf.filename_export + '.' + output_type)
-            ) for output_type in automaster_conf.outputs],
-        }
-    })
+    return api_response_accepted(
+        {'message': 'automaster accepted', 'task': task.to_dict()},
+        location=task.url
+    )
+
+
+    #     # output returned
+    #     'data': {
+    #         # function
+    #         'name': 'automaster',
+    #         # input arguments
+    #         'conf': ns2kw(automaster_conf),
+    #         # 'processhandle': processhandle,
+    #         'location': os.path.join(
+    #             # 'data',
+    #             os.path.basename(automaster_conf.filename_export) + '.wav'
+    #         ),
+    #         'locations': [os.path.join(
+    #             os.path.basename(automaster_conf.filename_export + '.' + output_type)
+    #         ) for output_type in automaster_conf.outputs],
+    #     }
+    # })
 
 @api_smp.route('/automaster', methods=['GET', 'POST'])
 def automaster() -> Response:
