@@ -79,10 +79,20 @@ async function poll(path: string) {
   return data
 }
 
+async function getBlob(path: string, params?:Array<[string, string]>) {
+  const url = new URL(apiUrl(path))
+  if (params) {
+    url.search = new URLSearchParams(params).toString()
+  }
+  const response = await request(url.toString(), 'GET')
+  return await response.blob()
+}
+
 export default {
   get,
+  getBlob,
   put,
+  poll,
   post,
   upload,
-  poll
 }
