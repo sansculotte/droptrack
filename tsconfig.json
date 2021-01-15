@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "baseUrl": "./app-js",
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": "./webapp-js",
     "experimentalDecorators": true,
     "sourceMap": true,
     "noImplicitAny": true,
@@ -10,10 +11,10 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "pretty": true,
-    "module": "commonjs",
-    "allowSyntheticDefaultImports": true,
+    "module": "esnext",
+    "moduleResolution": "node",
     "target": "es6",
-    "lib": ["dom", "dom.iterable", "es6", "scripthost", "es2016.array.include"],
+    "lib": ["dom", "dom.iterable", "es2017", "es6", "scripthost", "es2016.array.include"],
     "jsx": "react"
   },
   "include": ["./webapp-js/**/*"]
