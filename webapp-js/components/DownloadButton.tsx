@@ -13,7 +13,6 @@ interface Props {
 
 const fetchBlob = async (url: string) => {
   const blob = await http.getBlob(url)
-//    const file = new File([blob], name, {type: blob.type, lastModified: Date.now()});
   return URL.createObjectURL(blob)
 }
 
