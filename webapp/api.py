@@ -137,7 +137,6 @@ def upload_file() -> Response:
         )
         soundfile.save(location)
         url = url_for('api.download_file', filename=filename, _external=True)
-        current_app.queue.send(url)
         return api_response_ok({'message': 'File accepted'})
     else:
         return api_response_error({'message': 'Invalid File'})
