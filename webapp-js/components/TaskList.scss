@@ -1,15 +1,15 @@
 ul.taskList {
   & > li {
+    display: flex;
     &:hover {
       background-color: #f479b3;
     }
-    display: flex;
     dt {
-      width: 80%;
+      flex: 1;
     }
     dd {
       margin: 0;
-      width: 20%;
+      flex: 0 0 50px;
     }
   }
 }

@@ -10,11 +10,13 @@ type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
 type CorsMethod = 'navigate' | 'same-origin' | 'no-cors' | 'cors' | undefined
 
 const apiUrl = (path: string) => {
-  return API_URL + path
+  const url = new URL(API_URL)
+  url.pathname = path
+  return url
 }
 
 async function request(
-  url: string,
+  url: URL,
   method: HttpMethod = 'GET',
   body?: any,
   headers?: Headers,
@@ -25,16 +27,16 @@ async function request(
     'X-Authentication': window.localStorage.getItem('apiKey') || ''
   })
   const credentials = 'same-origin'
-  const response = await fetch(url, { body, method, headers, mode, credentials })
+  const response = await fetch(url.toString(), { body, method, headers, mode, credentials })
   return response
 }
 
 async function get(path: string, params?:Array<[string, string]>) {
-  const url = new URL(apiUrl(path))
+  const url = apiUrl(path)
   if (params) {
     url.search = new URLSearchParams(params).toString()
   }
-  const response = await request(url.toString(), 'GET')
+  const response = await request(url, 'GET')
   return await response.json()
 }
 
@@ -79,10 +81,20 @@ async function poll(path: string) {
   return data
 }
 
+async function getBlob(path: string, params?:Array<[string, string]>) {
+  const url = apiUrl(path)
+  if (params) {
+    url.search = new URLSearchParams(params).toString()
+  }
+  const response = await request(url, 'GET')
+  return await response.blob()
+}
+
 export default {
   get,
+  getBlob,
   put,
+  poll,
   post,
   upload,
-  poll
 }

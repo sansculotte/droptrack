@@ -81,7 +81,7 @@ class Task(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(UUID(), unique=True, nullable=False, default=uuid4)
-    name = db.Column(db.String(length=64), nullable=False, unique=True)
+    name = db.Column(db.String(length=64), nullable=False)
     status = db.Column(db.Enum(Status), default=Status.processing)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     result_location = db.Column(db.String(256))  # path to resource/file
@@ -105,10 +105,9 @@ class Task(db.Model):
             return url_for(
                 'api.download_file',
                 filename=self.result_location,
-                _external=True
             )
         else:
-            return url_for('api.show_task', uuid=self.uuid, _external=True)
+            return url_for('api.show_task', uuid=self.uuid)
 
     @property
     def is_processing(self):
