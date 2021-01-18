@@ -4,9 +4,6 @@ import { useDropzone } from 'react-dropzone'
 
 import UploadSymbol from 'components/UploadSymbol'
 
-import * as styles from './FileDrop.scss'
-
-
 interface Props {
   onDrop: (args: Array<any>) => void
   accept: string
@@ -21,7 +18,7 @@ export default (props: Props) => {
   } = useDropzone({onDrop, accept: props.accept})
 
   return (
-    <div className={styles.fileDrop} {...getRootProps()}>
+    <div {...getRootProps()}>
       <input {...getInputProps()} />
       {
         isDragActive

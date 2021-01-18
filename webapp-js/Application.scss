@@ -22,10 +22,10 @@ main.app {
     }
   }
   section {
+    max-width: 600px;
+    height: 500px;
     & > ul {
-      position: absolute;
-      width: 600px;
-      height: 500px;
+      width: 100%;
       padding: 0;
       list-style: none;
       background-color: #ddd;
@@ -91,5 +91,8 @@ main.app {
 @media screen and (max-width: 37.5em) {
   main.app {
     width: 100%;
+    section {
+      width: 100%;
+    }
   }
 }
