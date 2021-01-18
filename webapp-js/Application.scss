@@ -64,7 +64,17 @@ main.app {
       border: 2px solid silver;
     }
   }
-  button, input[type="button"] {
+  a.button {
+    display: block;
+    padding: 12px 16px 0 16px; 
+    line-height: 1;
+    & > span {
+      & + div {
+        margin-left: 10px;
+      }
+    }
+  }
+  button, input[type="button"], a.button {
     background-color: #990000;
     color: white;
     border: none;

@@ -11,6 +11,8 @@ import ApiResponse from 'interfaces/ApiResponse'
 import File from 'interfaces/File'
 import Task from 'interfaces/Task'
 
+import * as styles from '../Application.scss'
+
 
 interface Props {
   flashMessage: (message: string) => void
@@ -47,12 +49,14 @@ class Workspace extends React.Component<Props, State> {
         <menu>
           <input type="button" onClick={this.hideAll.bind(this)} value="Drop" />
           <input type="button" onClick={this.showFileList.bind(this)} value="Files" />
-          <input type="button" onClick={this.showTasks.bind(this)} value="Tasks" />
-          <TaskPoll
-            tasks={this.state.tasks}
-            updateTasks={this.updateTasks.bind(this)}
-            flashMessage={this.props.flashMessage}
-          />
+          <a className={styles.button} onClick={this.showTasks.bind(this)}>
+              <span>Tasks</span>
+              <TaskPoll
+                tasks={this.state.tasks}
+                updateTasks={this.updateTasks.bind(this)}
+                flashMessage={this.props.flashMessage}
+              />
+          </a>
         </menu>
         {this.state.activeWidget === 'files'
           && <FileList files={this.state.files} />
