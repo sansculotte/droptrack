@@ -46,6 +46,7 @@ export default (props: Props) => {
 
   return (
     <button
+      style={{width: '30px', height: '30px'}}
       onClick={() => startDownload(props.url)}
       title={props.title}
       className={styles.downloadButton}

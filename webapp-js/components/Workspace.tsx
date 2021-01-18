@@ -1,12 +1,14 @@
-import * as React from 'react'
-
 import http from 'lib/http'
+import React from 'react'
+
+import { ActionPanel } from './actions'
 import FileDrop from './FileDrop'
 import FileList from './FileList'
 import FileUrl from './FileUrl'
 import TaskList from './TaskList'
 import TaskPoll from './TaskPoll'
 
+import Action from 'interfaces/Action'
 import ApiResponse from 'interfaces/ApiResponse'
 import File from 'interfaces/File'
 import Task from 'interfaces/Task'
@@ -17,7 +19,8 @@ interface Props {
 }
 
 interface State {
-  activeWidget: 'drop' | 'files' | 'tasks'
+  activeWidget: 'actions' | 'drop' | 'files' | 'tasks'
+  actions: Array<Action>
   files: Array<File>
   lastUpdate: number
   message?: string
@@ -30,6 +33,7 @@ class Workspace extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
+      actions: [],
       files: [],
       tasks: new Map(),
       lastUpdate: new Date().getTime(),
@@ -45,9 +49,10 @@ class Workspace extends React.Component<Props, State> {
     return (
       <div>
         <menu>
-          <input type="button" onClick={this.hideAll.bind(this)} value="Drop" />
+          <input type="button" onClick={this.showDrop.bind(this)} value="Drop" />
           <input type="button" onClick={this.showFileList.bind(this)} value="Files" />
-          <input type="button" onClick={this.showTasks.bind(this)} value="Tasks" />
+          <input type="button" onClick={this.showActionList.bind(this)} value="Actions" />
+          <input type="button" onClick={this.showTaskList.bind(this)} value="Tasks" />
           <TaskPoll
             tasks={this.state.tasks}
             updateTasks={this.updateTasks.bind(this)}
@@ -56,6 +61,9 @@ class Workspace extends React.Component<Props, State> {
         </menu>
         {this.state.activeWidget === 'files'
           && <FileList files={this.state.files} />
+        }
+        {this.state.activeWidget === 'actions'
+          && <ActionPanel actions={this.state.actions} addTask={this.addTask.bind(this)} />
         }
         {this.state.activeWidget === 'tasks'
           && <TaskList tasks={this.state.tasks} />
@@ -81,15 +89,19 @@ class Workspace extends React.Component<Props, State> {
     }
   }
 
-  hideAll() {
+  showDrop() {
     this.setState({activeWidget: 'drop'})
+  }
+
+  showActionList() {
+    this.setState({activeWidget: 'actions'}, () => this.loadActionList())
   }
 
   showFileList() {
     this.setState({activeWidget: 'files'}, () => this.loadFileList())
   }
 
-  showTasks() {
+  showTaskList() {
     this.setState({activeWidget: 'tasks'})
   }
 
@@ -102,6 +114,14 @@ class Workspace extends React.Component<Props, State> {
   updateTasks(tasks: Map<string, Task>) {
     const lastUpdate = new Date().getTime()
     this.setState({tasks, lastUpdate})
+  }
+
+  async loadActionList() {
+    const response = await http.get('/actions')
+    if (response.status === 'ok') {
+      const actions = response.data
+      this.setState({ actions })
+    }
   }
 
   async loadFileList() {

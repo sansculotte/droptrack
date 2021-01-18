@@ -190,3 +190,47 @@ def show_task(uuid):
         if task.is_processing:
             return api_response_accepted(task.to_dict(), location=task.url)
     return not_found()
+
+
+@api.route('/actions')
+def list_actions():
+    """
+    Action Catalog
+    :param str:
+    """
+    return api_response_ok([
+        {
+            'name': 'autoedit',
+            'url': '/actions/autoedit',
+            'parameters': {
+# TODO device a way to pass parameter mapping from python to javascript
+#
+#                'files': {'type': List[File], 'range': Any, 'default': None},
+#                'assemble_mode': {
+#                   'type': str,
+#                   'range': random|sequential,
+#                   'default': 'random'
+#                },
+#                'assemble_crossfade': {
+#                    'type': number,
+#                    'range': 0-99999,
+#                    'default': 10
+#                },
+#                'duration': {
+#                    'type': number,
+#                    'range': 0-99999,
+#                    'default': 180
+#                },
+            }
+        },
+        {
+            'name': 'autocover',
+            'url': '/actions/autocover',
+            'parameters': {}
+        }
+    ])
+
+
+@api.route('/actions/<any(autedit,autocover):action>')
+def show_action(action: str):
+    pass
