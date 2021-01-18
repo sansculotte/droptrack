@@ -11,6 +11,8 @@ import ApiResponse from 'interfaces/ApiResponse'
 import File from 'interfaces/File'
 import Task from 'interfaces/Task'
 
+import * as styles from '../Application.scss'
+
 
 interface Props {
   flashMessage: (message: string) => void
@@ -41,34 +43,40 @@ class Workspace extends React.Component<Props, State> {
     this.loadFileList()
   }
 
-  render() {
+  public render() {
     return (
       <div>
         <menu>
           <input type="button" onClick={this.hideAll.bind(this)} value="Drop" />
           <input type="button" onClick={this.showFileList.bind(this)} value="Files" />
-          <input type="button" onClick={this.showTasks.bind(this)} value="Tasks" />
-          <TaskPoll
-            tasks={this.state.tasks}
-            updateTasks={this.updateTasks.bind(this)}
-            flashMessage={this.props.flashMessage}
-          />
+          <a className={styles.button} onClick={this.showTasks.bind(this)}>
+              <span>Tasks</span>
+              <TaskPoll
+                tasks={this.state.tasks}
+                updateTasks={this.updateTasks.bind(this)}
+                flashMessage={this.props.flashMessage}
+              />
+          </a>
         </menu>
+        {this.state.activeWidget === 'drop'
+          && (
+            <form>
+              <FileDrop accept="audio/*" onDrop={this.handleDropFile.bind(this)} />
+              <FileUrl addTask={this.addTask.bind(this)} flashMessage={this.props.flashMessage} />
+            </form>
+          )
+        }
         {this.state.activeWidget === 'files'
           && <FileList files={this.state.files} />
         }
         {this.state.activeWidget === 'tasks'
           && <TaskList tasks={this.state.tasks} />
         }
-        <form>
-          <FileDrop accept="audio/*" onDrop={this.handleDropFile.bind(this)} />
-          <FileUrl addTask={this.addTask.bind(this)} flashMessage={this.props.flashMessage} />
-        </form>
      </div>
     )
   }
 
-  handleDropFile(files: Array<any>) {
+  private handleDropFile(files: Array<any>) {
     const results = files.map(f => http.upload('/files', f, 'soundfile'))
     if (results.length > 0) {
       results[0].then((response: ApiResponse) => {
@@ -81,30 +89,30 @@ class Workspace extends React.Component<Props, State> {
     }
   }
 
-  hideAll() {
+  private hideAll() {
     this.setState({activeWidget: 'drop'})
   }
 
-  showFileList() {
+  private showFileList() {
     this.setState({activeWidget: 'files'}, () => this.loadFileList())
   }
 
-  showTasks() {
+  private showTasks() {
     this.setState({activeWidget: 'tasks'})
   }
 
-  addTask(task: Task) {
+  private addTask(task: Task) {
     const { tasks } = this.state
     tasks.set(task.uuid, task)
     this.setState({ tasks })
  }
 
-  updateTasks(tasks: Map<string, Task>) {
+  private updateTasks(tasks: Map<string, Task>) {
     const lastUpdate = new Date().getTime()
     this.setState({tasks, lastUpdate})
   }
 
-  async loadFileList() {
+  private async loadFileList() {
     const response = await http.get('/files')
     if (response.status === 'ok') {
       const { files } = response.data

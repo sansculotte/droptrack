@@ -22,10 +22,10 @@ main.app {
     }
   }
   section {
+    max-width: 600px;
+    height: 500px;
     & > ul {
-      position: absolute;
-      width: 600px;
-      height: 500px;
+      width: 100%;
       padding: 0;
       list-style: none;
       background-color: #ddd;
@@ -64,7 +64,17 @@ main.app {
       border: 2px solid silver;
     }
   }
-  button, input[type="button"] {
+  a.button {
+    display: block;
+    padding: 12px 16px 0 16px; 
+    line-height: 1;
+    & > span {
+      & + div {
+        margin-left: 10px;
+      }
+    }
+  }
+  button, input[type="button"], a.button {
     background-color: #990000;
     color: white;
     border: none;
@@ -81,5 +91,8 @@ main.app {
 @media screen and (max-width: 37.5em) {
   main.app {
     width: 100%;
+    section {
+      width: 100%;
+    }
   }
 }

@@ -1,1 +1,1 @@
-export const fileDrop: string;
+export {};
