@@ -9,6 +9,7 @@ type AssemblyMode = 'random' | 'sequential'
 
 interface AutoEditParameters {
   duration: number
+  numsegs: number
   files: Array<File>
   assembly_mode: AssemblyMode
   [key: string]: AssemblyMode | number | Array<File>

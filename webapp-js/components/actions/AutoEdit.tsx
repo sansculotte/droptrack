@@ -25,8 +25,13 @@ const AutoEdit = (props: Props) => {
     setParameters(parameters)
   }
 
-  const handleAssemblyModechange = (ev: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleAssemblyModeChange = (ev: React.ChangeEvent<HTMLSelectElement>) => {
     parameters.assembly_mode = ev.currentTarget.value as AutoEditParameters['assembly_mode']
+    setParameters(parameters)
+  }
+
+  const handleNumsegsChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
+    parameters.numsegs = parseInt(ev.currentTarget.value, 10)
     setParameters(parameters)
   }
 
@@ -56,11 +61,18 @@ const AutoEdit = (props: Props) => {
       <select
         placeholder="assemble mode"
         value={parameters.assembly_mode}
-        onChange={handleAssemblyModechange}
+        onChange={handleAssemblyModeChange}
       >
         <option value="random">random</option>
         <option value="sequential">sequential</option>
       </select>
+      <input
+        placeholder="numsegs: 0-???"
+        type="number"
+        name="numsegs"
+        value={parameters.numsegs}
+        onChange={handleNumsegsChange}
+      />
       <input type="submit" value="start" />
     </form>
   )
