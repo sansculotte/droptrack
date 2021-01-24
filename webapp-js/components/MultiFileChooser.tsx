@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import DeleteButton from './DeleteButton'
 import { FileChooser } from './FileChooser'
 
@@ -27,6 +27,8 @@ const MultiFileChooser = (props: Props) => {
     setSelectedFiles(selectedFiles.filter(f => f !== file))
 
   const toogleFileChooser = () => setShowFileChooser(!showFileChooser)
+
+  useEffect(() => props.setFiles(selectedFiles), [selectedFiles])
 
   return (
     <div className={styles.multiFileChooser}>

@@ -38,10 +38,9 @@ const AutoEdit = (props: Props) => {
   const handleSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault()
     const url = '/actions/autoedit' // '/api/autoedit'
+    console.log(parameters)
     const response = await http.post(url, parameters as ApiData)
-    if (response.ok) {
-      props.addTask(response.data)
-    }
+    props.addTask(response.data)
   }
 
   return (

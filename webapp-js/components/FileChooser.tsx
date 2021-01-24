@@ -18,7 +18,7 @@ const FileChooser = (props: Props) => {
   const loadFileList = async () => {
     const response = await http.get('/files')
     if (response.status === 'ok') {
-      const { files } = response.data
+      const { files } = response.data as {files: Array<File>}
       setAvailableFiles(
         files.filter(f => props.exclude.find(x => x.name === f.name) === undefined)
       )
