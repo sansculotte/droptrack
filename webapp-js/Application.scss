@@ -77,12 +77,23 @@ main.app {
       border: 2px solid silver;
     }
   }
-  button, input[type="button"] {
-    height: 40px;
+  a.button {
+    display: block;
+    padding: 12px 16px 0 16px; 
+    line-height: 1;
+    cursor: pointer;
+    & > span {
+      & + div {
+        margin-left: 10px;
+      }
+    }
+  }
+  button, input[type="button"], a.button {
     background-color: $darkred;
     color: white;
     border: none;
     font-weight: 600;
+    cursor: pointer;
   }
   .backgroundRed {
     background-color: $brightred,
@@ -90,10 +101,16 @@ main.app {
   .backgroundBlack {
     background-color: $black,
   }
+  button {
+    height: 40px;
+  }
 }
 
 @media screen and (max-width: 37.5em) {
   main.app {
     width: 100%;
+    section {
+      width: 100%;
+    }
   }
 }
