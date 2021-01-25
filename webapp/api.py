@@ -231,15 +231,15 @@ def list_actions():
     ])
 
 
-@api.route('/actions/<any(autoedit,autocover):action>', methods=['POST'])
-def show_action(action: str):
-    data = request.json
-    files = data['files']
-    name = files[0]['name']
-    task = Task(
-        name=f'{action} {name}',
-        user=g.user,
-    )
-    db.session.add(task)
-    db.session.commit()
-    return api_response_ok(task.to_dict())
+#@api.route('/actions/<any(autoedit,autocover):action>', methods=['POST'])
+#def show_action(action: str):
+#    data = request.json
+#    files = data['files']
+#    name = files[0]['name']
+#    task = Task(
+#        name=f'{action} {name}',
+#        user=g.user,
+#    )
+#    db.session.add(task)
+#    db.session.commit()
+#    return api_response_ok(task.to_dict())
