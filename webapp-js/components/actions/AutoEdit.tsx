@@ -21,7 +21,10 @@ const AutoEdit = (props: Props) => {
   const [ parameters, setParameters ] = useState(props.parameters)
 
   const handleDurationChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
-    parameters.duration = parseInt(ev.currentTarget.value, 10)
+    const value = parseInt(ev.currentTarget.value, 10)
+    if (!isNaN(value)) {
+      parameters.duration = value
+    }
     setParameters(parameters)
   }
 
@@ -31,7 +34,10 @@ const AutoEdit = (props: Props) => {
   }
 
   const handleNumsegsChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
-    parameters.numsegs = parseInt(ev.currentTarget.value, 10)
+    const value = parseInt(ev.currentTarget.value, 10)
+    if (!isNaN(value)) {
+      parameters.numsegs = value
+    }
     setParameters(parameters)
   }
 
@@ -53,7 +59,7 @@ const AutoEdit = (props: Props) => {
       <MultiFileChooser setFiles={setFiles} selected={parameters.files} />
       <input
         placeholder="duration: 0-99999"
-        type="number"
+        type="text"
         name="duration"
         value={parameters.duration}
         onChange={handleDurationChange}
@@ -68,7 +74,7 @@ const AutoEdit = (props: Props) => {
       </select>
       <input
         placeholder="numsegs: 0-???"
-        type="number"
+        type="text"
         name="numsegs"
         value={parameters.numsegs}
         onChange={handleNumsegsChange}
