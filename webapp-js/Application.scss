@@ -62,6 +62,9 @@ main.app {
       grid-column: 1 / span 2;
       width: 100%;
     }
+    label {
+      color: $dark;
+    }
     input[type="button"] {
       grid-column: 2 / span 1;
     }

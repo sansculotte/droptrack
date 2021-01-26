@@ -2,10 +2,12 @@ import React, { useState } from 'react'
 
 import http from 'lib/http'
 
+import { ErrorMessage } from '../ErrorMessage'
 import { MultiFileChooser } from '../MultiFileChooser'
 
 import { AutoEditParameters } from 'interfaces/Action'
 import ApiData from 'interfaces/ApiData'
+import File from 'interfaces/File'
 import Task from 'interfaces/Task'
 
 
@@ -21,12 +23,14 @@ const AutoEdit = (props: Props) => {
   const [ duration, setDuration ] = useState(`${props.parameters.duration}`)
   const [ numsegs, setNumsegs ] = useState(`${props.parameters.numsegs}`)
   const [ assemblyMode, setAssemblyMode ] = useState(props.parameters.assembly_mode)
+  const [ errors, setErrors ] = useState<Array<string>>([])
 
   const handleDurationChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(ev.currentTarget.value, 10)
     if (!isNaN(value)) {
       setDuration(`${value}`)
     }
+    setErrors([])
   }
 
   const handleAssemblyModeChange = (ev: React.ChangeEvent<HTMLSelectElement>) => {
@@ -39,19 +43,46 @@ const AutoEdit = (props: Props) => {
     if (!isNaN(value)) {
       setNumsegs(`${value}`)
     }
+    setErrors([])
+  }
+
+  const handleFilesChange = (files: Array<File>) => {
+    setFiles(files)
+    setErrors([])
   }
 
   const handleSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault()
     const url = '/api/autoedit' // '/actions/autoedit'
-    const parameters = { files, duration, numsegs, assembly_mode: assemblyMode }
-    const response = await http.post(url, parameters as ApiData)
-    props.addTask(response.data)
+    const errors = []
+    const parameters = {
+      files,
+      duration: parseInt(duration, 10),
+      numsegs: parseInt(numsegs, 10),
+      assembly_mode: assemblyMode
+    }
+    if (files.length === 0) {
+      errors.push('Please Add an Input File')
+    }
+    if (parameters.duration > 500) {
+      errors.push('Please keep duration under 500')
+    }
+    if (parameters.duration < 0) {
+      errors.push('Duration must be positive')
+    }
+    if (errors.length > 0) {
+      setErrors(errors)
+    }
+    else {
+      const response = await http.post(url, parameters as ApiData)
+      props.addTask(response.data)
+    }
   }
 
   return (
     <form onSubmit={handleSubmit}>
-      <MultiFileChooser setFiles={setFiles} selected={files} />
+      {errors.length > 0 && <ErrorMessage errors={errors} />}
+      <MultiFileChooser setFiles={handleFilesChange} selected={files} />
       <label>Duration</label>
       <input
         placeholder="duration: 0-99"
