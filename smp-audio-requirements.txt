@@ -1,0 +1,10 @@
+pyAudioAnalysis
+colorcet
+matplotlib
+essentia
+librosa
+pydub
+joblib
+matchering
+tqdm
+eyed3

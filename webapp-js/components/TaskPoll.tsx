@@ -14,6 +14,7 @@ interface Props {
 const activeTasks = (tasks: Map<string, Task>) =>
     new Map([...tasks].filter(([_, t]) => t.status === 'processing'))
 
+
 export default (props: Props) => {
 
   const [ color, setColor ] = useState('#000')
@@ -44,8 +45,9 @@ export default (props: Props) => {
     <div style={
       {
         position: 'relative',
-        width: '50px',
-        height: '50px',
+        top: '-2px',
+        width: '20px',
+        height: '20px',
         borderRadius: '50%',
         backgroundColor: color,
         transition: 'background-color 50ms ease-in, 300ms ease-out',
@@ -55,8 +57,9 @@ export default (props: Props) => {
         {
             color: 'white',
             position: 'absolute',
-            left: '50%',
-            top: '50%'
+            left: 'calc(50% - 3px)',
+            top: 'calc(50% - 4px)',
+            fontSize: '10px'
         }
     }>{activeTasks(props.tasks).size}</div></div>
   )

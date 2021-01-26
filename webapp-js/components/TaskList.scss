@@ -1,9 +1,6 @@
 ul.taskList {
   & > li {
     display: flex;
-    &:hover {
-      background-color: #f479b3;
-    }
     dt {
       flex: 1;
     }

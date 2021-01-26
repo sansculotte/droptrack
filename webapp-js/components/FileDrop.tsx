@@ -4,7 +4,6 @@ import { useDropzone } from 'react-dropzone'
 
 import UploadSymbol from 'components/UploadSymbol'
 
-
 interface Props {
   onDrop: (args: Array<any>) => void
   accept: string
