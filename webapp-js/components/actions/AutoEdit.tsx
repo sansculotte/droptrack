@@ -6,7 +6,6 @@ import { MultiFileChooser } from '../MultiFileChooser'
 
 import { AutoEditParameters } from 'interfaces/Action'
 import ApiData from 'interfaces/ApiData'
-import File from 'interfaces/File'
 import Task from 'interfaces/Task'
 
 
@@ -18,65 +17,64 @@ interface Props {
 
 const AutoEdit = (props: Props) => {
 
-  const [ parameters, setParameters ] = useState(props.parameters)
+  const [ files, setFiles ] = useState(props.parameters.files)
+  const [ duration, setDuration ] = useState(`${props.parameters.duration}`)
+  const [ numsegs, setNumsegs ] = useState(`${props.parameters.numsegs}`)
+  const [ assemblyMode, setAssemblyMode ] = useState(props.parameters.assembly_mode)
 
   const handleDurationChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(ev.currentTarget.value, 10)
     if (!isNaN(value)) {
-      parameters.duration = value
+      setDuration(`${value}`)
     }
-    setParameters(parameters)
   }
 
   const handleAssemblyModeChange = (ev: React.ChangeEvent<HTMLSelectElement>) => {
-    parameters.assembly_mode = ev.currentTarget.value as AutoEditParameters['assembly_mode']
-    setParameters(parameters)
+    const assemblyMode = ev.currentTarget.value as AutoEditParameters['assembly_mode']
+    setAssemblyMode(assemblyMode)
   }
 
   const handleNumsegsChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(ev.currentTarget.value, 10)
     if (!isNaN(value)) {
-      parameters.numsegs = value
+      setNumsegs(`${value}`)
     }
-    setParameters(parameters)
-  }
-
-  const setFiles = (files: Array<File>) => {
-    parameters.files = files
-    setParameters(parameters)
   }
 
   const handleSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault()
     const url = '/api/autoedit' // '/actions/autoedit'
-    console.log(parameters)
+    const parameters = { files, duration, numsegs, assembly_mode: assemblyMode }
     const response = await http.post(url, parameters as ApiData)
     props.addTask(response.data)
   }
 
   return (
     <form onSubmit={handleSubmit}>
-      <MultiFileChooser setFiles={setFiles} selected={parameters.files} />
+      <MultiFileChooser setFiles={setFiles} selected={files} />
+      <label>Duration</label>
       <input
-        placeholder="duration: 0-99999"
+        placeholder="duration: 0-99"
         type="text"
         name="duration"
-        value={parameters.duration}
+        value={duration}
         onChange={handleDurationChange}
       />
+      <label>Assembly Mode</label>
       <select
         placeholder="assemble mode"
-        value={parameters.assembly_mode}
+        value={assemblyMode}
         onChange={handleAssemblyModeChange}
       >
         <option value="random">random</option>
         <option value="sequential">sequential</option>
       </select>
+      <label>Number of Segements</label>
       <input
         placeholder="numsegs: 0-???"
         type="text"
         name="numsegs"
-        value={parameters.numsegs}
+        value={numsegs}
         onChange={handleNumsegsChange}
       />
       <input type="submit" value="start" />

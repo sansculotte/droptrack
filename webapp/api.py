@@ -203,6 +203,12 @@ def list_actions():
             'name': 'autoedit',
             'url': '/actions/autoedit',
             'parameters': {
+                'files': [],
+                'assemble_mode': 'random',
+                'assemble_crossfade': 10,
+                'duration': 180,
+                'numsegs': 23,
+
 # TODO device a way to pass parameter mapping from python to javascript
 #
 #                'files': {'type': List[File], 'range': Any, 'default': None},
