@@ -1,0 +1,8 @@
+@import '../theme/animations';
+
+div.pulse {
+	animation-name: colorCycle;
+	animation-duration: 1s;
+  animation-iteration-count: infinite;
+	animation-direction: alternate;
+}

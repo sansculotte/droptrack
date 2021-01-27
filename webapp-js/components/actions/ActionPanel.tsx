@@ -12,6 +12,7 @@ import * as styles from './Actions.scss'
 interface Props {
   actions: Array<Action>
   addTask: (task: Task) => void
+  tasks: Map<string, Task>
 }
 
 
@@ -24,7 +25,7 @@ const ActionPanel = (props: Props) => {
       {
       (action === null)
         ? <ActionList actions={props.actions} setAction={setAction} />
-        : startAction(action, props.addTask)
+        : startAction(action, props.addTask, props.tasks)
       }
     </section>
   )
