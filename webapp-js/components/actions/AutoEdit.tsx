@@ -4,7 +4,7 @@ import http from 'lib/http'
 
 import { ErrorMessage } from '../ErrorMessage'
 import { MultiFileChooser } from '../MultiFileChooser'
-import Pulse from '../Pulse'
+import Process from '../Process'
 
 import { AutoEditTaskResult } from './AutoEditTaskResult'
 
@@ -142,7 +142,7 @@ const AutoEdit = (props: Props) => {
         ? <input type="submit" value="start" />
         : task.status === 'done'
         ? <AutoEditTaskResult url={task.url} />
-        : <div>Processing<Pulse /></div>
+        : <Process />
       }
     </form>
   )
