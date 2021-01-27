@@ -7,8 +7,8 @@ import DownloadButton from './DownloadButton'
 const fileUrl = (name: string) => `/files/${name}`
 
 export default (props: {files: Array<File>}) =>
-  <section>
-    <ul className={styles.fileList}>
+  <section className={styles.fileList}>
+    <ul>
       {props.files.map((file, index) =>
         <li key={`file_${index}`}>
           <dt>{ file.name }</dt>

@@ -1,7 +1,8 @@
 import * as React from 'react'
 
 import Task from 'interfaces/Task'
-import DownloadButton from './DownloadButton'
+
+import { TaskResult } from './TaskResult'
 
 import * as style from './TaskList.scss'
 
@@ -17,11 +18,7 @@ export default (props: Props) =>
       {Array.from(props.tasks.values()).map(t =>
         <li key={t.uuid}>
           <dt>{ t.name }</dt>
-          <dd>{
-            (t.status === 'done' && t.url) &&
-              <DownloadButton url={t.url} name={t.name} title="result" />
-            }
-          </dd>
+          <dd><TaskResult task={t} /></dd>
         </li>
       )}
     </ul>

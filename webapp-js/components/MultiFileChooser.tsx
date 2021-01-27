@@ -32,14 +32,16 @@ const MultiFileChooser = (props: Props) => {
 
   return (
     <div className={styles.multiFileChooser}>
-      <ul>
-        {selectedFiles.map(f =>
-          <li key={f.name}>
-            <dt>{f.name}</dt>
-            <dd><DeleteButton onClick={() => removeFile(f)} /></dd>
-          </li>
-        )}
+      {selectedFiles.length > 0 &&
+        <ul>
+          {selectedFiles.map(f =>
+            <li key={f.name}>
+              <dt>{f.name}</dt>
+              <dd><DeleteButton onClick={() => removeFile(f)} /></dd>
+            </li>
+          )}
         </ul>
+      }
       {showFileChooser
         ? <FileChooser exclude={selectedFiles} onSelect={addFile} />
         : <button onClick={toogleFileChooser}>Add File</button>

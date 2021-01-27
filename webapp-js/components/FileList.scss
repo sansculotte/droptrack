@@ -1,15 +1,18 @@
-ul.fileList {
-  & > li {
-    display: flex;
-    color: black;
-    &:hover {
-      background-color: #f479b3;
-    }
-    dt {
-      flex: 1;
-    }
-    dd {
-      flex: 0 0 50px;
+section.fileList {
+  height: 500px;
+  & > ul {
+    & > li {
+      display: flex;
+      color: black;
+      &:hover {
+        background-color: #f479b3;
+      }
+      dt {
+        flex: 1;
+      }
+      dd {
+        flex: 0 0 50px;
+      }
     }
   }
 }

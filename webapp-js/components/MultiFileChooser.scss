@@ -1,5 +1,10 @@
+@import '../theme/colors';
+
 div.multiFileChooser {
-  & > ul > li {
-    height: 40px;
+  & > ul {
+    border: 2px solid $light;
+    & > li {
+      height: 40px;
+    }
   }
 }
