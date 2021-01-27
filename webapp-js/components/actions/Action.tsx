@@ -12,8 +12,8 @@ const startAction = (
   tasks: Map<string, Task>
 ) => {
   switch (action.name) {
-    case 'autoedit':
-      return <AutoEdit
+      case 'autoedit':
+        return <AutoEdit
         parameters={action.parameters as AutoEditParameters}
         addTask={addTask}
         tasks={tasks}

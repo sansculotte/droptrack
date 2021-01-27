@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 
 import { startAction } from './Action'
 import ActionList from './ActionList'
+import BreadCrumbs from '../BreadCrumbs'
 
 import Action from 'interfaces/Action'
 import Task from 'interfaces/Task'
@@ -25,7 +26,9 @@ const ActionPanel = (props: Props) => {
       {
       (action === null)
         ? <ActionList actions={props.actions} setAction={setAction} />
-        : startAction(action, props.addTask, props.tasks)
+        : <BreadCrumbs action={action}>
+            {startAction(action, props.addTask, props.tasks)}
+          </BreadCrumbs>
       }
     </section>
   )
