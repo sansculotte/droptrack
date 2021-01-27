@@ -49,6 +49,11 @@ const AutoEdit = (props: Props) => {
     }
   )
 
+  const restart = () => {
+    setTask(undefined)
+    setTaskId(null)
+  }
+
   const handleDurationChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(ev.currentTarget.value, 10)
     if (!isNaN(value)) {
@@ -141,8 +146,8 @@ const AutoEdit = (props: Props) => {
       {!task
         ? <input type="submit" value="start" />
         : task.status === 'done'
-        ? <AutoEditTaskResult url={task.url} />
-        : <Process />
+          ? <><AutoEditTaskResult url={task.url} /><a onClick={restart}>Restart</a></>
+          : <Process />
       }
     </form>
   )
