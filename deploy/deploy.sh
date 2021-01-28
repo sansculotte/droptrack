@@ -3,16 +3,16 @@
 set -e
 
 target_host=${1-"droptrack"}
-install_dir=${2-"/opt/droptrack"}
+app_dir=${2-"/opt/droptrack"}
 remote_user=${3-"deploy"}
-filespace=${4-"$install_dir/data"}
+filespace=${4-"$app_dir/data"}
 
 python="python3.8"
 build_dir="build"
 js_target_dir="webapp/static/js"
 
 # timestamp as version
-version="$(date +%s)"
+version="$(date +%Y-%m-%d_%H-%M)"
 
 run_remote() {
     ssh "$remote_user"@"$target_host" "$1"
@@ -23,7 +23,7 @@ clean() {
     rm -Rf "$js_target_dir/*"
 }
 
-prepare() {
+prepare_local() {
     clean
     mkdir -p "$build_dir"
     mkdir -p "$js_target_dir"
@@ -43,42 +43,47 @@ build() {
 }
 
 prepare_remote() {
-    if [[ ! $(run_remote "ls $install_dir") ]]; then
-        echo "Please create install dir $install_dir"
+    if [[ ! $(run_remote "ls $app_dir") ]]; then
+        echo "Please create install dir $app_dir"
         exit
     fi
-    if [[ ! $(run_remote "ls $install_dir/_versions") ]]; then
-        echo "Please create install dir $install_dir/_versions"
+    if [[ ! $(run_remote "ls $app_dir/_versions") ]]; then
+        echo "Please create install dir $app_dir/_versions"
         exit
     fi
-    run_remote "mkdir $install_dir/_versions/$version"
+    run_remote "mkdir $app_dir/_versions/$version"
 }
 
 deploy() {
-    
-    # transfer files
-    scp -r "$build_dir/webapp" "$remote_user"@"$target_host":"$install_dir/_versions/$version"
 
-    run_remote "cd $install_dir/_versions/$version \
-                && virtualenv -p $python venv\
-                && ./venv/bin/pip install -r requirements.txt"
+    install_dir="$app_dir/_versions/$version/"
+
+    # transfer files
+    scp -r "$build_dir/webapp" "$remote_user"@"$target_host":"$install_dir"
+    scp -C "$build_dir/config.py" "$remote_user"@"$target_host":"$install_dir"
+    scp -C "$build_dir/cli.py" "$remote_user"@"$target_host":"$install_dir"
+    scp -C "$build_dir/requirements.txt" "$remote_user"@"$target_host":"$install_dir"
+
+    run_remote "cd $app_dir/_versions/$version && virtualenv -p $python venv"
+    run_remote "cd $app_dir/_versions/$version && ./venv/bin/pip install -r requirements.txt"
 
     # remove current "current" symlink
-    run_remote "if [ -L $install_dir/current ]; then rm $install_dir/current; fi"
+    run_remote "if [ -L $app_dir/current ]; then rm $app_dir/current; fi"
 
     # link new
-    run_remote "ln -s $install_dir/_versions/$version $install_dir/current"
+    run_remote "ln -s $app_dir/_versions/$version $app_dir/current"
 
     # cleanup, remove old installations, keep 5
-    run_remote "cd $install_dir/_versions/ && ls -C1 -t| awk 'NR>5'|xargs rm -Rf"
+    run_remote "cd $app_dir/_versions/ && ls -C1 -t| awk 'NR>5'|xargs rm -Rf"
 
     # run migrations
-    run_remote "cd $install_dir/_versions/$version && .venv/bin/flask db upgrade"
+    run_remote "cd $app_dir/_versions/$version && .venv/bin/flask db upgrade"
 
     # restart app server
     run_remote "service uwsgi restart"
 }
 
-prepare
+prepare_local
+prepare_remote
 build
 deploy
