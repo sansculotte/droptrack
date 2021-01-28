@@ -1,5 +1,5 @@
 import os
-import youtube_dl
+import youtube_dl  # type: ignore
 from .models import Task
 
 

@@ -20,7 +20,8 @@ export default (props: Props) => {
   
   const [ fileUrl, setFileUrl ] = useState<string>()
 
-  const startDownload = async (url: string) => {
+  const startDownload = async (ev: React.MouseEvent, url: string) => {
+    ev.preventDefault()
     try {
         const fileUrl = await fetchBlob(url)
         setFileUrl(fileUrl)
@@ -46,7 +47,8 @@ export default (props: Props) => {
 
   return (
     <button
-      onClick={() => startDownload(props.url)}
+      style={{width: '30px', height: '30px'}}
+      onClick={(ev) => startDownload(ev, props.url)}
       title={props.title}
       className={styles.downloadButton}
     >⬇</button> 

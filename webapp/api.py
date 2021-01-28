@@ -190,3 +190,62 @@ def show_task(uuid):
         if task.is_processing:
             return api_response_accepted(task.to_dict(), location=task.url)
     return not_found()
+
+
+@api.route('/actions')
+def list_actions():
+    """
+    Action Catalog
+    :param str:
+    """
+    return api_response_ok([
+        {
+            'name': 'autoedit',
+            'url': '/actions/autoedit',
+            'parameters': {
+                'files': [],
+                'assemble_mode': 'random',
+                'assemble_crossfade': 10,
+                'duration': 180,
+                'numsegs': 23,
+
+# TODO device a way to pass parameter mapping from python to javascript
+#
+#                'files': {'type': List[File], 'range': Any, 'default': None},
+#                'assemble_mode': {
+#                   'type': str,
+#                   'range': random|sequential,
+#                   'default': 'random'
+#                },
+#                'assemble_crossfade': {
+#                    'type': number,
+#                    'range': 0-99999,
+#                    'default': 10
+#                },
+#                'duration': {
+#                    'type': number,
+#                    'range': 0-99999,
+#                    'default': 180
+#                },
+            }
+        },
+        {
+            'name': 'autocover',
+            'url': '/actions/autocover',
+            'parameters': {}
+        }
+    ])
+
+
+#@api.route('/actions/<any(autoedit,autocover):action>', methods=['POST'])
+#def show_action(action: str):
+#    data = request.json
+#    files = data['files']
+#    name = files[0]['name']
+#    task = Task(
+#        name=f'{action} {name}',
+#        user=g.user,
+#    )
+#    db.session.add(task)
+#    db.session.commit()
+#    return api_response_ok(task.to_dict())

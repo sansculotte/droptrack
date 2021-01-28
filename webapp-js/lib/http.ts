@@ -1,9 +1,7 @@
 declare var API_URL: string
 import 'whatwg-fetch'
 
-interface ApiData {
-  [key: string]: string | number | ApiData
-}
+import ApiData from 'interfaces/ApiData'
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
 

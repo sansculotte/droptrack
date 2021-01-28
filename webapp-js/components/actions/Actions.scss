@@ -1,0 +1,26 @@
+@import '../../theme/colors';
+
+section.actions {
+  padding: 10px;
+  box-sizing: border-box;
+  ul {
+    padding: 0;
+    margin: 0;
+    & > li {
+      cursor: pointer;
+      display: flex;
+      padding: 4px 8px 4px 8px;
+      &:hover {
+        background-color: $highlight;
+      }
+      dt {
+        flex: 1;
+        margin: auto;
+      }
+      dd {
+        flex: 0 0 50px;
+        margin: auto;
+      }
+    }
+  }
+}

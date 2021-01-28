@@ -11,6 +11,8 @@ from .queue import Queue
 from .api import api
 from .models import db
 
+from .api_smp import api_smp
+
 
 try:
     APP_ENV = os.environ['APP_ENV']
@@ -25,6 +27,7 @@ def root():
 def setup_routes(app: Flask):
     app.add_url_rule('/', 'root', root)
     app.register_blueprint(api)
+    app.register_blueprint(api_smp, url_prefix='/api')
 
 
 def setup_queue(app: Flask):
