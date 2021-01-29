@@ -60,6 +60,7 @@ deploy() {
 
     # transfer files
     scp -r "$build_dir/webapp" "$remote_user"@"$target_host":"$install_dir"
+    scp -r "$build_dir/migrations" "$remote_user"@"$target_host":"$install_dir"
     scp -C "$build_dir/config.py" "$remote_user"@"$target_host":"$install_dir"
     scp -C "$build_dir/cli.py" "$remote_user"@"$target_host":"$install_dir"
     scp -C "$build_dir/requirements.txt" "$remote_user"@"$target_host":"$install_dir"
@@ -77,7 +78,7 @@ deploy() {
     run_remote "cd $app_dir/_versions/ && ls -C1 -t| awk 'NR>5'|xargs rm -Rf"
 
     # run migrations
-    run_remote "cd $app_dir/_versions/$version && .venv/bin/flask db upgrade"
+    run_remote "cd $app_dir/_versions/$version && FLASK_APP='webapp:create_app()' ./venv/bin/flask db upgrade"
 
     # restart app server
     run_remote "service uwsgi restart"
