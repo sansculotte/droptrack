@@ -26,7 +26,7 @@ def upgrade():
     sa.Column('password', Password(length=166), nullable=True),
     sa.Column('api_key', sa.String(length=128), nullable=True),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('api_api'),
+    sa.UniqueConstraint('api_key'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('name')
     )
