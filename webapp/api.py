@@ -174,7 +174,7 @@ def list_tasks():
     })
 
 
-@api.route('tasks/<uuid:uuid>', methods=['PUT'])
+@api.route('/tasks/<uuid:uuid>', methods=['PUT'])
 def update_task(uuid):
     """
     Update Task status and result_location
