@@ -12,8 +12,6 @@ from .api import api
 from .models import db
 from .api_smp import api_smp
 
-from .api_smp import api_smp
-
 
 try:
     APP_ENV = os.environ['APP_ENV']

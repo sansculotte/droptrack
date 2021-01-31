@@ -52,12 +52,10 @@ Create User
     ./run_player.sh
 
 
-=======
 Deploy
 ------
 
-Directory deploy has an ansible playbook and configuration templates to provision a
-droptrack server.
-https://docs.ansible.com/ansible/latest/user_guide/playbooks.html
-
-Use fabric to deploy new iterations.
+There is bash script for the deploy of the webapp, which
+should be doing the right things, given you have a privileged
+deploy user on yout remote server and all the system
+dependencies installed.

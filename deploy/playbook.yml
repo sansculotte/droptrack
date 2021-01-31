@@ -7,7 +7,6 @@
   become_method: sudo
 
   vars:
-    server_name: drop.sansculotte.net 
     install_dir: /opt/droptrack
     app_dir: /opt/droptrack/current
     app_config_dir: /opt/droptrack/config
@@ -17,7 +16,6 @@
     data_dir: /opt/droptrack/data
     cert_dir: /usr/local/etc/nginx/ssl
     uwsgi_socket: /run/uwsgi/app/droptrack/socket
-    www_user: www
 
   tasks:
    - name: Create install directory
@@ -28,50 +26,59 @@
      file: path=/run/uwsgi/app/droptrack state=directory owner={{ www_user }}
 
    - name: Install tools
-     pkgng:
-         name: htop, bash, logrotate
-         state: present
+     apt:
+         pkg:
+         - htop
+         - syslog-ng
+         - logrotate
 
    - name: Ensure python3.7 is present
-     pkgng:
-         name: python37, py37-virtualenv py37-pip
-         state: present
+     apt:
+         pkg:
+         - python3
+         - python3-virtualenv
 
    - name: Configure syslog
-     template: src=templates/syslog/40-droptrack.conf.j2 dest=/etc/syslog.d/40-droptrack.conf
+     template: src=templates/syslog/40-droptrack.conf.j2 dest=/etc/syslog-ng/conf.d/40-droptrack.conf
 
    - name: Configure logrotate
-     template: src=templates/logrotate/droptrack.j2 dest=/usr/local/etc/logrotate.d/droptrack
+     template: src=templates/logrotate/droptrack.j2 dest=/etc/logrotate.d/droptrack
 
    # dependencies
    - name: Ensure libzmq is installed
-     pkgng:
-         name: libzmq4
+     apt:
+         name: libzmq5
 
    # app-server
    - name: Ensure uwsgi is present
-     pkgng:
+     apt:
          name: uwsgi
+         state: present
+
+   - name: Ensure uwsgi python3 plugin is present
+     apt:
+         name: uwsgi-plugin-python3
+         state: present
 
    - name: Create uwsgi config dir
      file: path=/etc/uwsgi/apps-enabled state=directory
 
    - name: Configure uwsgi
-     template: src=templates/uwsgi/droptrack.ini.j2 dest=/usr/local/etc/uwsgi/droptrack.ini
+     template: src=templates/uwsgi/droptrack.ini.j2 dest=/etc/uwsgi/apps-enabled/droptrack.ini
 
    # webserver
    - name: Ensure nginx is present
-     pkgng:
+     apt:
          name: nginx
          state: present
 
    - name: Create nginx directory
-     file: path=/usr/local/etc/nginx/sites-enabled state=directory
+     file: path=/etc/nginx/sites-enabled state=directory
 
    - name: Configure nginx
-     copy: src=templates/nginx/nginx.conf dest=/usr/local/etc/nginx/nginx.conf owner=root group=wheel mode=644
+     copy: src=templates/nginx/nginx.conf dest=/etc/nginx/nginx.conf owner=root group=root mode=644
    - name: Configure sites
-     template: src=templates/nginx/{{ server_name }}.conf.j2 dest=/usr/local/etc/nginx/sites-enabled/{{ server_name }}.conf
+     template: src=templates/nginx/droptrack.conf.j2 dest=/etc/nginx/sites-enabled/{{ server_name }}.conf
 
    # upload certificates
    #- name: Create certificate directory

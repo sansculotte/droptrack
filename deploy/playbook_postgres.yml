@@ -1,0 +1,24 @@
+   - name: Ensure postgres is installed
+     apt:
+         pkg:
+         - postgresql
+         - python3-psycopg2
+
+   - name: Ensure postgres is running
+     service: name=postgresql state=started enabled=yes
+
+  
+   # this is not quite working :(
+   # setup  database server
+   - name: Create a new database with name "droptrack"
+     community.general.postgresql_db:
+         name: "droptrack"
+     sudo_user: postgres
+         encoding: 'UTF-8'
+
+   - name: Postgres user and privileges
+     community.general.postgresql_user:
+       db: "droptrack"
+       name: "droptrack"
+       password: "{{ postgres_password }}"
+       priv: "ALL/droptrack:ALL"

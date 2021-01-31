@@ -17,7 +17,7 @@ from .lib.helpers import (
     validate_url,
     validate_soundfile,
 )
-from .models import User, Task
+from .models import User, Task, Status
 from .downloader import download
 """
 The main mechanics of the webapp.
@@ -180,7 +180,30 @@ def list_tasks():
     })
 
 
-@api.route('/tasks/<uuid:uuid>')
+@api.route('tasks/<uuid:uuid>', methods=['PUT'])
+def update_task(uuid):
+    """
+    Update Task status and result_location
+    """
+    task = Task.query.filter(
+        Task.uuid == uuid,
+        Task.user_id == g.user.id
+    ).first()
+
+    if task:
+        try:
+            task.status = Status[request.json['status']]
+            task.result_location = request.json['result_location']
+        except Exception as e:
+            return api_response_error({'message': str(e)})
+        else:
+            db.session.add(task)
+            db.session.commit()
+        return api_response_ok(task.to_dict())
+    return not_found()
+
+
+@api.route('/tasks/<uuid:uuid>', methods=['GET'])
 def show_task(uuid):
     """
     Task details and status 202 if still processing
