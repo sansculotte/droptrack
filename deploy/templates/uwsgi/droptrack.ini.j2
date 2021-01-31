@@ -1,0 +1,24 @@
+[uwsgi]
+plugin = python38
+
+uid = {{ www_user }}
+gid = {{ www_user }}
+
+base = {{ app_dir }}
+logto = {{ log_dir }}/uwsgi.log
+
+env = APP_ENV=config.{{ app_env }}Config
+# env = SECRETS={{ app_config_dir }}/secrets
+env = SQLALCHEMY_DATABASE_URI = postgresql://droptrack:{{ postgres_password }}@localhost:5432/droptrack
+
+venv = %(base)/venv
+chdir = %(base)
+module = webapp:create_app()
+workers = {{ uwsgi_workers }}
+
+# socket = {{ uwsgi_socket }}
+http-socket = :9090
+
+# monitoring
+stats = 127.0.0.1:1717
+memory_report = true

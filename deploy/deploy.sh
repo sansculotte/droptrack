@@ -18,9 +18,17 @@ run_remote() {
     ssh "$remote_user"@"$target_host" "$1"
 }
 
+# remove build artefacts
 clean() {
     rm -Rf "$build_dir"
     rm -Rf "$js_target_dir/*"
+}
+
+# assert basic code quality
+# with typechecks and unit tests
+check() {
+    mypy webapp
+    ./run_tests.sh webapp
 }
 
 prepare_local() {
@@ -29,29 +37,19 @@ prepare_local() {
     mkdir -p "$js_target_dir"
     # js dependencies
     npm install
-    # check
-    mypy webapp
-    ./run_tests.sh webapp
+    check
 }
 
 build() {
     npm run build
     git archive HEAD | tar -f - -xC "$build_dir"
     cp -a webapp/static/scripts $build_dir/webapp/static/
-    cp config.py.dist "$build_dir"/config.py
+    cp config.py "$build_dir"/config.py
     find "$build_dir" -iname tests_*.py -execdir rm {} \;
 }
 
 prepare_remote() {
-    if [[ ! $(run_remote "ls $app_dir") ]]; then
-        echo "Please create install dir $app_dir"
-        exit
-    fi
-    if [[ ! $(run_remote "ls $app_dir/_versions") ]]; then
-        echo "Please create install dir $app_dir/_versions"
-        exit
-    fi
-    run_remote "mkdir $app_dir/_versions/$version"
+    run_remote "mkdir -p $app_dir/_versions/$version"
 }
 
 deploy() {
@@ -65,6 +63,7 @@ deploy() {
     scp -C "$build_dir/cli.py" "$remote_user"@"$target_host":"$install_dir"
     scp -C "$build_dir/requirements.txt" "$remote_user"@"$target_host":"$install_dir"
 
+    # install requeirements into remote virtualenv
     run_remote "cd $app_dir/_versions/$version && virtualenv -p $python venv"
     run_remote "cd $app_dir/_versions/$version && ./venv/bin/pip install -r requirements.txt"
 

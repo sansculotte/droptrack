@@ -1,0 +1,11 @@
+droptrack:
+    hosts:
+        <your ip>
+    vars:
+        server_name: <your hostname>
+        ansible_connection: ssh
+        ansible_user: deploy
+        ansible_python_interpreter: /usr/local/bin/python3
+        postgres_password: <password>
+        www_user: www-data
+        uwsgi_workers: 2

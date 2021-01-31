@@ -30,7 +30,7 @@ class ProductionConfig(Config):
     API_URL = 'http://' + SERVER_NAME
     SECRET_KEY = os.environ.get("SECRET_KEY")
     SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI")
-    UPLOAD_DIR = '/opt/droptrack/upload'
+    UPLOAD_DIR = '/opt/droptrack/data/upload'
 
 
 class DevelopmentConfig(Config):

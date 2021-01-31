@@ -53,3 +53,12 @@ Create User
 *Player*
 
     ./run_player.sh
+
+
+Deploy
+------
+
+There is bash script for the deploy of the webapp, which
+should be doing the right things, given you have a privileged
+deploy user on yout remote server and all the system
+dependencies installed.

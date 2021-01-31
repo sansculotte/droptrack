@@ -1,0 +1,66 @@
+server {
+  listen 80;
+  server_name {{ server_name }};
+  client_max_body_size 200M;
+
+  add_header X-Frame-Options "SAMEORIGIN";
+  add_header X-XSS-Protection "1; mode=block";
+  add_header X-Content-Type-Options "nosniff";
+  add_header 'Referrer-Policy' 'origin';
+
+  add_header Content-Security-Policy "default-src 'self';
+    script-src 'unsafe-inline' 'self';
+    worker-src blob: ;
+    child-src blob: ;
+    style-src 'unsafe-inline' 'self';
+    font-src 'self'";
+
+  resolver 1.1.1.1 8.8.8.8 valid=300s;
+  resolver_timeout 5s;
+
+  access_log {{ log_dir }}/access.log;
+  error_log {{ log_dir }}/error.log debug;
+
+  uwsgi_intercept_errors on;
+
+  location = /favicon.ico {
+    log_not_found off;
+    access_log off;
+  }
+
+  location = /robots.txt {
+    allow all;
+    log_not_found off;
+    access_log off;
+    alias {{ app_dir }}/app/static/robots.txt;
+  }
+
+  # Block access to "hidden" files and directories whose names begin with a
+  # period.
+  location ~ (^|/)\. {
+    return 403;
+  }
+
+  location /scripts {
+    root {{ app_dir }}/app/static;
+    expires max;
+  }
+
+  location /images {
+    root {{ app_dir }}/app/static;
+    expires max;
+  }
+
+  location / {
+      try_files /maintenance.html @uri @uri/ @droptrack;
+  }
+
+  location @droptrack {
+      proxy_set_header Host $host;
+      proxy_pass http://localhost:9090;
+
+#    include uwsgi_params;
+#    uwsgi_pass unix:{{ uwsgi_socket }};
+  }
+
+}
