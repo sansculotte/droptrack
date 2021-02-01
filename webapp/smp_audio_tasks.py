@@ -1,5 +1,6 @@
-# import sys
-# sys.path.append('/home/ub/code/smp_audio')
+import sys
+sys.path.append('/home/x75/src/smp_base')
+sys.path.append('/home/x75/src/smp_audio')
 
 # from argparse import Namespace
 from smp_audio.autoedit import autoedit_conf_default  # type: ignore
