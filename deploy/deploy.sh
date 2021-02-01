@@ -62,10 +62,12 @@ deploy() {
     scp -C "$build_dir/config.py" "$remote_user"@"$target_host":"$install_dir"
     scp -C "$build_dir/cli.py" "$remote_user"@"$target_host":"$install_dir"
     scp -C "$build_dir/requirements.txt" "$remote_user"@"$target_host":"$install_dir"
+    scp -C "$build_dir/smp-audio-requirements.txt" "$remote_user"@"$target_host":"$install_dir"
 
     # install requeirements into remote virtualenv
     run_remote "cd $app_dir/_versions/$version && virtualenv -p $python venv"
     run_remote "cd $app_dir/_versions/$version && ./venv/bin/pip install -r requirements.txt"
+    run_remote "cd $app_dir/_versions/$version && ./venv/bin/pip install -r smp-audio-requirements.txt"
 
     # remove current "current" symlink
     run_remote "if [ -L $app_dir/current ]; then rm $app_dir/current; fi"
@@ -77,10 +79,11 @@ deploy() {
     run_remote "cd $app_dir/_versions/ && ls -C1 -t| awk 'NR>5'|xargs rm -Rf"
 
     # run migrations
+    run_remote "cd $app_dir/_versions/$version && FLASK_APP='webapp:create_app()' ./venv/bin/flask db stamp d8fdcb44420e"
     run_remote "cd $app_dir/_versions/$version && FLASK_APP='webapp:create_app()' ./venv/bin/flask db upgrade"
 
     # restart app server
-    run_remote "service uwsgi restart"
+    run_remote "sudo service uwsgi restart"
 }
 
 prepare_local
