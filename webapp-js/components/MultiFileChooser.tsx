@@ -8,6 +8,7 @@ import * as styles from './MultiFileChooser.scss'
 
 
 interface Props {
+  allowedExtensions?: Array<string>
   selected?: Array<File>
   setFiles: (files: Array<File>) => void
 }
@@ -43,7 +44,11 @@ const MultiFileChooser = (props: Props) => {
         </ul>
       }
       {showFileChooser
-        ? <FileChooser exclude={selectedFiles} onSelect={addFile} />
+        ? <FileChooser
+            exclude={selectedFiles}
+            onSelect={addFile}
+            allowedExtensions={props.allowedExtensions}
+          />
         : <button onClick={toogleFileChooser}>Add File</button>
       }
     </div>
