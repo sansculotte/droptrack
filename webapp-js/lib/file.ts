@@ -8,4 +8,14 @@ const getExtension = (file: File): string => {
   return ''
 }
 
-export { getExtension }
+const sortCompare = (field: string = 'name') => (a: File, b: File) => {
+  if (a[field] < b[field]) {
+    return -1
+  }
+  if (a[field] > b[field]) {
+    return 1
+  }
+  return 0
+}
+
+export { getExtension, sortCompare }

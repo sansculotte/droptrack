@@ -1,5 +1,5 @@
 import http from 'lib/http'
-import { getExtension } from 'lib/file'
+import { getExtension, sortCompare } from 'lib/file'
 import React, { useEffect, useState } from 'react'
 
 import File from 'interfaces/File'
@@ -44,7 +44,7 @@ const FileChooser = (props: Props) => {
   return (
     <div className={styles.fileChooser}>
       <ul>
-        {availableFiles.map((file, index) =>
+        {availableFiles.sort(sortCompare('name')).map((file, index) =>
           <li key={index} onClick={() => select(index)}>{file.name}</li>
         )}
       </ul>
