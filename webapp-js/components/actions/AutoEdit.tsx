@@ -117,7 +117,11 @@ const AutoEdit = (props: Props) => {
   return (
     <form onSubmit={handleSubmit}>
       {errors.length > 0 && <ErrorMessage errors={errors} />}
-      <MultiFileChooser setFiles={handleFilesChange} selected={files} />
+      <MultiFileChooser
+        setFiles={handleFilesChange}
+        selected={files}
+        allowedExtensions={['wav', 'mp3', 'ogg', 'flac']}
+      />
       <label>Duration</label>
       <input
         placeholder="duration: 0-99"
