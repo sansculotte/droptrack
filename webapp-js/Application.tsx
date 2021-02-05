@@ -41,7 +41,7 @@ class Application extends React.Component<Props, State> {
         <h1>Droptrack</h1>
         {this.state.message &&
           <ExpireMessage
-            delay={2000}
+            delay={3500}
             timeStamp={new Date().getTime()}
           >{this.state.message}</ExpireMessage>
         }

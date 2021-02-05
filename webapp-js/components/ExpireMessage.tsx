@@ -5,14 +5,14 @@ import * as style from './ExpireMessage.scss'
 
 
 interface Props {
-  delay: number
+  delay?: number
   timeStamp: number
   children: React.ReactNode
 }
 
 export default (props: Props)  => {
 
-  const { delay } = props
+  const delay = props.delay || 3000
   const [ visible, setVisible ] = useState(true)
   let id: number | undefined
 

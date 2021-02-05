@@ -1,7 +1,19 @@
+@import "../theme/base";
+@import "../theme/colors";
+
 div.message {
   box-sizing: border-box;
-  width: 100%;
+  position: absolute;
+  top: 0;
+  width: $desktop-width;
   padding: 20px;
-  border: 2px solid #ccc;
+  border: 2px solid $middle;
+  background-color: $light;
   margin: 20px 0;
+}
+
+@media screen and (max-width: $mobile-breakpoint) {
+  div.message {
+    width: 100%;
+  }
 }
