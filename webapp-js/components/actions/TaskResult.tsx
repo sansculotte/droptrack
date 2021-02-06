@@ -13,16 +13,15 @@ interface ResultFile {
 }
 
 
-const AutoEditTaskResult = (props: {url: Task['url']}) => {
+const TaskResult = (props: {url: Task['url']}) => {
 
   const [ resultFiles, setResultFiles ] = useState<Array<ResultFile>>([])
     
   useEffect(
     () => {
-      http.get(props.url).then(data =>
-        setResultFiles(data.data.output_files)
-      )
-    },
+      http.get(props.url).then(
+        data => setResultFiles(data.data.output_files)
+    )},
     []
   )
 
@@ -46,4 +45,4 @@ const AutoEditTaskResult = (props: {url: Task['url']}) => {
   )
 }
 
-export { AutoEditTaskResult }
+export { TaskResult }

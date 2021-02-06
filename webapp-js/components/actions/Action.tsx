@@ -22,6 +22,7 @@ const startAction = (
       return <AutoCover
         parameters={action.parameters as AutoCoverParameters}
         addTask={addTask}
+        tasks={tasks}
       />
   }
 }

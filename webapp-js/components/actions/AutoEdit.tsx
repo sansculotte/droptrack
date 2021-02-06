@@ -6,7 +6,7 @@ import { ErrorMessage } from '../ErrorMessage'
 import { MultiFileChooser } from '../MultiFileChooser'
 import Process from '../Process'
 
-import { AutoEditTaskResult } from './AutoEditTaskResult'
+import { TaskResult } from './TaskResult'
 
 import { AutoEditParameters } from 'interfaces/Action'
 import ApiData from 'interfaces/ApiData'
@@ -150,7 +150,7 @@ const AutoEdit = (props: Props) => {
       {!task
         ? <input type="submit" value="start" />
         : task.status === 'done'
-          ? <><AutoEditTaskResult url={task.url} /><a onClick={restart}>Restart</a></>
+          ? <><TaskResult url={task.url} /><a onClick={restart}>Restart</a></>
           : <Process />
       }
     </form>
