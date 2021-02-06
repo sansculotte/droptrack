@@ -79,7 +79,7 @@ def autoedit_POST():
     # request data copy to configuration
     request_data = request.json
     # extract filenames from files
-    request_data['filenames'] = [f['name'] for f in request_data['filenames']]
+    # request_data['filenames'] = [f['name'] for f in request_data['files']]
     for k in autoedit_conf_default:
         k_req = f'{k}'
         if k_req in request_data:
