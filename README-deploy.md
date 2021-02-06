@@ -5,66 +5,69 @@ deployment. The upstream approach is in `deploy/deploy.sh` and needs
 documentation. There is also an `ansible` playbook which I haven't
 fully figured out yet.
 
-## owald naive bottom-up approach
+## owald journey initial
 
-First time round need to set up / fix a few things. Provisioning, right?
+First time round need to set up / fix a few things. Provisioning
+light.
 
 Create a 'deploy' user on the remote system which we will use to log
-in to the server, set up stuff, update stuff, restart the app when done.
+in to the server, set up and update stuff, and to restart the app when
+the update is done.
 
-When created copy your SSH key to that user's authorized_keys file.
+When the user is created, copy your SSH key to that user's
+authorized_keys file with
 
-Initial setup session once logged in goes like this:
+`ssh-copy-id deploy@deployhost`
 
-cd /home/www
+Once logged in the initial interactive setup session goes like this:
 
-git clone https://github.com/x75/droptrack.git droptrack-x75
-
-cd droptrack-x75
-
-git checkout deploy-opt
-
+```bash
+cd /path/to/webroot
+git clone https://github.com/x75/droptrack.git
+cd droptrack
 virtualenv venv
-
 ./venv/bin/pip install -r requirements.txt
-
 ./venv/bin/pip install -r smp-audio-requirements.txt
-
 ./venv/bin/flask db stamp
-
 ./venv/bin/flask db upgrade
-
-migrating real data
-
-cat /home/x75/src/droptrack/droptrack.sql | sqlite3 droptrack.db
-
+# migrating real data, sql file has been prepared beforehand
+cat /path/to/dev/droptrack/droptrack.sql | sqlite3 droptrack.db
 npm install
-
 npm run build
-
-chgrp -R www-data data/upload/
-
-cd old-dev-dir
-
+# copy data
+cd /path/to/dev/droptrack/data/upload
 for name in `sqlite3 ../../droptrack.db "select name from User;"` ; do rsync -av --progress $name /home/www/droptrack-x75/data/upload/ ; done
-
-test new server with flask/uwsgi manual
-
+# test new server with flask/uwsgi manual
 ./run_webapp.sh
+uwsgi --uwsgi-socket 0.0.0.0:3031 --callable app -w app --master --processes 1 --threads 1
+# change uwsgi droptrack.ini to new directory
+sudo service uwsgi restart
+```
 
-uwsgi --uwsgi-socket 0.0.0.0:3031 --callable app -w app --master --processes 2 --threads 2
+If there is any trouble with
 
-change uwsgi droptrack.ini to new directory
+`RuntimeError: cannot cache function '__shear_dense'`
 
-restart uwsgi
+this is a permission problem. Do a
 
-if there is any trouble with
+`chown -R deploy.deploy /path/to/webroot/droptrack`
 
-RuntimeError: cannot cache function '__shear_dense' 
+There also was an issue with getting the SQLALCHEMY_DATABASE_URI from
+the env, hardcoded that for now into the production config.
 
-just is a permission problem. dir right now is owned deploy.deploy
+## owald journey quick deploy
 
-there also was an issue with getting the SQLALCHEMY_DATABASE_URI from the env, hardcoded that for now
+When that is done once, quick deploy is done by this
+```bash
+ssh deploy@deployhost <<ENDSSH
+cd /home/www/droptrack-x75
+git checkout -f
+git pull
+npm install
+npm run build
+sudo service uwsgi restart
+ENDSSH
+```
 
 ## notes
 
