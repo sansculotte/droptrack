@@ -13,7 +13,7 @@ interface ResultFile {
 }
 
 
-const TaskResult = (props: {url: Task['url']}) => {
+const AutoActionTaskResult = (props: {url: Task['url']}) => {
 
   const [ resultFiles, setResultFiles ] = useState<Array<ResultFile>>([])
     
@@ -45,4 +45,4 @@ const TaskResult = (props: {url: Task['url']}) => {
   )
 }
 
-export { TaskResult }
+export { AutoActionTaskResult }
