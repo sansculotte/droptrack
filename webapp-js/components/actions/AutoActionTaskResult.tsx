@@ -25,12 +25,21 @@ const AutoActionTaskResult = (props: {url: Task['url']}) => {
     []
   )
 
+  // ellipsis in the middle think
+  const limitChars = (str: string, length=30) => {
+    const head = 7
+    if (str.length > length) {
+      return str.substr(0, length - head) + '…' + str.substr(-head)
+    }
+    return str
+  }
+
   return (
     <ul>
     {
       resultFiles.map(f =>
         <li key={f.filename}>
-          <dt>{f.filename}</dt>
+          <dt title={f.filename}>{limitChars(f.filename)}</dt>
           <dd>
             <DownloadButton
               url={`/files/${f.filename}`}
