@@ -197,10 +197,11 @@ def autocover_POST():
     async_process.start()
 
     # response
-    return api_response_accepted(
-        {'message': 'autoedit accepted', 'task': task.to_dict()},
-        location=task.url
-    )
+    # return api_response_accepted(
+    #     {'message': 'autocover accepted', 'task': task.to_dict()},
+    #     location=task.url
+    # )
+    return api_response_accepted(task.to_dict(), location=task.url)
 
     # return api_response_started({
     #     'message': 'autocover started',
@@ -296,10 +297,11 @@ def automaster_POST():
     # processhandle = process_create_pid_file(async_process, automaster_conf)
 
     # res = main_automaster(automaster_conf)
-    return api_response_accepted(
-        {'message': 'automaster accepted', 'task': task.to_dict()},
-        location=task.url
-    )
+    # return api_response_accepted(
+    #     {'message': 'automaster accepted', 'task': task.to_dict()},
+    #     location=task.url
+    # )
+    return api_response_accepted(task.to_dict(), location=task.url)
 
     #     # output returned
     #     'data': {
