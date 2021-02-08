@@ -1,0 +1,33 @@
+@import "../theme/colors";
+
+div.expandablePanel {
+  & > div {
+    position: absolute;
+    width: 300px;
+    right: 20px;
+    height: auto;
+    background-color: $lighter;
+    border: 2px solid $white;
+    padding: 8px 0 8px 0;
+    ul {
+      margin: 0;
+      padding: 0;
+      & > li {
+        display: flex;
+        height: 32px;
+        padding-left: 4px;
+        &:not(:last-child) {
+          border-bottom: 2px solid $white;
+        }
+        dt {
+          flex: 1;
+          overflow: hidden;
+          margin: auto;
+        }
+        dd {
+          flex: 0 0 30px;
+        }
+      }
+    }
+  }
+}

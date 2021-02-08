@@ -2,9 +2,12 @@
 
 div.multiFileChooser {
   & > ul {
-    border: 2px solid $light;
+    border: 2px solid $middle;
     & > li {
       height: 40px;
+      dt {
+        flex: 0 0 30px;
+      }
     }
   }
 }

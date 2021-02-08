@@ -13,7 +13,7 @@ interface ResultFile {
 }
 
 
-const TaskResult = (props: {url: Task['url']}) => {
+const AutoActionTaskResult = (props: {url: Task['url']}) => {
 
   const [ resultFiles, setResultFiles ] = useState<Array<ResultFile>>([])
     
@@ -25,12 +25,21 @@ const TaskResult = (props: {url: Task['url']}) => {
     []
   )
 
+  // ellipsis in the middle think
+  const limitChars = (str: string, length=30) => {
+    const head = 7
+    if (str.length > length) {
+      return str.substr(0, length - head) + '…' + str.substr(-head)
+    }
+    return str
+  }
+
   return (
     <ul>
     {
       resultFiles.map(f =>
         <li key={f.filename}>
-          <dt>{f.filename}</dt>
+          <dt title={f.filename}>{limitChars(f.filename)}</dt>
           <dd>
             <DownloadButton
               url={`/files/${f.filename}`}
@@ -45,4 +54,4 @@ const TaskResult = (props: {url: Task['url']}) => {
   )
 }
 
-export { TaskResult }
+export { AutoActionTaskResult }
