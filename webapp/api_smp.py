@@ -112,7 +112,8 @@ def autoedit_POST():
 
     # response
     return api_response_accepted(
-        {'message': 'autocover accepted', 'task': task.to_dict()},
+        # {'message': 'autocover accepted', 'task': task.to_dict()},
+        task.to_dict(),
         location=task.url
     )
 
@@ -184,7 +185,8 @@ def autocover_POST():
 
     # response
     return api_response_accepted(
-        {'message': 'autocover accepted', 'task': task.to_dict()},
+        # {'message': 'autocover accepted', 'task': task.to_dict()},
+        task.to_dict(),
         location=task.url
     )
 
@@ -263,7 +265,8 @@ def automaster_POST():
 
     # response
     return api_response_accepted(
-        {'message': 'automaster accepted', 'task': task.to_dict()},
+        # {'message': 'automaster accepted', 'task': task.to_dict()},
+        task.to_dict(),
         location=task.url
     )
 
