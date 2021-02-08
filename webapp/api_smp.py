@@ -109,27 +109,13 @@ def autoedit_POST():
         daemon=True,
     )
     async_process.start()
-    # create pid file in work dir
-    # response
-    return api_response_accepted(task.to_dict(), location=task.url)
 
-    # return api_response_started({
-    #     'message': 'autoedit started',
-    #     'data': {
-    #         # function
-    #         'name': 'autoedit',
-    #         # input arguments
-    #         'conf': ns2kw(autoedit_conf),
-    #         # output returned
-    #         # 'processhandle': processhandle,
-    #         'location': os.path.join(
-    #             os.path.basename(autoedit_conf.filename_export + '.wav')
-    #         ),
-    #         'locations': [os.path.join(
-    #             os.path.basename(autoedit_conf.filename_export + '.' + output_type)
-    #         ) for output_type in autoedit_conf.outputs],
-    #     }
-    # })
+    # response
+    return api_response_accepted(
+        {'message': 'autocover accepted', 'task': task.to_dict()},
+        location=task.url
+    )
+
 
 @api_smp.route('/autoedit', methods=['GET', 'POST'])
 def autoedit() -> Response:
@@ -197,29 +183,10 @@ def autocover_POST():
     async_process.start()
 
     # response
-    # return api_response_accepted(
-    #     {'message': 'autocover accepted', 'task': task.to_dict()},
-    #     location=task.url
-    # )
-    return api_response_accepted(task.to_dict(), location=task.url)
-
-    # return api_response_started({
-    #     'message': 'autocover started',
-    #     # output returned
-    #     'data': {
-    #         # function
-    #         'name': 'autocover',
-    #         # input arguments
-    #         'conf': ns2kw(autocover_conf),
-    #         # 'processhandle': processhandle,
-    #         'location': os.path.join(
-    #             os.path.basename(autocover_conf.filename_export) + '.json'
-    #         ),
-    #         'locations': [os.path.join(
-    #             os.path.basename(autocover_conf.filename_export + '.' + output_type)
-    #         ) for output_type in autocover_conf.outputs],
-    #     }
-    # })
+    return api_response_accepted(
+        {'message': 'autocover accepted', 'task': task.to_dict()},
+        location=task.url
+    )
 
 
 @api_smp.route('/autocover', methods=['GET', 'POST'])
@@ -294,31 +261,11 @@ def automaster_POST():
     )
     async_process.start()
 
-    # processhandle = process_create_pid_file(async_process, automaster_conf)
-
-    # res = main_automaster(automaster_conf)
-    # return api_response_accepted(
-    #     {'message': 'automaster accepted', 'task': task.to_dict()},
-    #     location=task.url
-    # )
-    return api_response_accepted(task.to_dict(), location=task.url)
-
-    #     # output returned
-    #     'data': {
-    #         # function
-    #         'name': 'automaster',
-    #         # input arguments
-    #         'conf': ns2kw(automaster_conf),
-    #         # 'processhandle': processhandle,
-    #         'location': os.path.join(
-    #             # 'data',
-    #             os.path.basename(automaster_conf.filename_export) + '.wav'
-    #         ),
-    #         'locations': [os.path.join(
-    #             os.path.basename(automaster_conf.filename_export + '.' + output_type)
-    #         ) for output_type in automaster_conf.outputs],
-    #     }
-    # })
+    # response
+    return api_response_accepted(
+        {'message': 'automaster accepted', 'task': task.to_dict()},
+        location=task.url
+    )
 
 @api_smp.route('/automaster', methods=['GET', 'POST'])
 def automaster() -> Response:
