@@ -28,7 +28,7 @@ main.app {
     position: absolute;
     width: $desktop-width;
     min-height: 500px;
-    background-color: $middle;
+    background-color: $light;
     & > ul {
       margin: 0;
       width: 100%;
@@ -98,8 +98,8 @@ main.app {
     font-weight: 600;
     cursor: pointer;
     &:hover {
-      background-color: $light;
-      transition: 'background-color 50ms ease-in, 50ms ease-out',
+      background-color: $middle;
+      transition: background-color 200ms ease-in;
     }
   }
   .backgroundRed {

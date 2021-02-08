@@ -10,6 +10,7 @@ from flask_migrate import Migrate # type: ignore
 from .queue import Queue
 from .api import api
 from .models import db
+
 from .api_smp import api_smp
 
 

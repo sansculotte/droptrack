@@ -13,29 +13,37 @@ interface ResultFile {
 }
 
 
-const AutoEditTaskResult = (props: {url: Task['url']}) => {
+const AutoActionTaskResult = (props: {url: Task['url']}) => {
 
   const [ resultFiles, setResultFiles ] = useState<Array<ResultFile>>([])
     
   useEffect(
     () => {
-      http.get(props.url).then(data =>
-        setResultFiles(data.data.output_files)
-      )
-    },
+      http.get(props.url).then(
+        data => setResultFiles(data.data.output_files)
+    )},
     []
   )
+
+  // ellipsis in the middle think
+  const limitChars = (str: string, length=30) => {
+    const head = 7
+    if (str.length > length) {
+      return str.substr(0, length - head) + '…' + str.substr(-head)
+    }
+    return str
+  }
 
   return (
     <ul>
     {
       resultFiles.map(f =>
         <li key={f.filename}>
-          <dt>{f.filename}</dt>
+          <dt title={f.filename}>{limitChars(f.filename)}</dt>
           <dd>
             <DownloadButton
               url={`/files/${f.filename}`}
-              name={f.format}
+              name={f.filename}
               title={f.filename}
             />
           </dd>
@@ -46,4 +54,4 @@ const AutoEditTaskResult = (props: {url: Task['url']}) => {
   )
 }
 
-export { AutoEditTaskResult }
+export { AutoActionTaskResult }
