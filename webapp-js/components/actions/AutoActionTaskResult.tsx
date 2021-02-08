@@ -43,7 +43,7 @@ const AutoActionTaskResult = (props: {url: Task['url']}) => {
           <dd>
             <DownloadButton
               url={`/files/${f.filename}`}
-              name={f.format}
+              name={f.filename}
               title={f.filename}
             />
           </dd>
