@@ -8,8 +8,14 @@ base = {{ app_dir }}
 logto = {{ log_dir }}/uwsgi.log
 
 env = APP_ENV=config.{{ app_env }}Config
-# env = SECRETS={{ app_config_dir }}/secrets
-env = SQLALCHEMY_DATABASE_URI = postgresql://droptrack:{{ postgres_password }}@localhost:5432/droptrack
+# env=SECRETS={{ app_config_dir }}/secrets
+env = SQLALCHEMY_DATABASE_URI=postgresql://droptrack:{{ postgres_password }}@localhost:5432/droptrack
+
+env = SMP_AUDIO_PATH={{ smp_audio_path }}
+env = LIBROSA_CACHE_DIR=/tmp
+env = LIBROSA_CACHE_DIR=/tmp
+env = NUMBA_CACHE_DIR=/tmp
+env = MPLCONFIGDIR=/tmp
 
 venv = %(base)/venv
 chdir = %(base)

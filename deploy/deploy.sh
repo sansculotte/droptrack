@@ -62,6 +62,7 @@ deploy() {
     scp -C "$build_dir/config.py" "$remote_user"@"$target_host":"$install_dir"
     scp -C "$build_dir/cli.py" "$remote_user"@"$target_host":"$install_dir"
     scp -C "$build_dir/requirements.txt" "$remote_user"@"$target_host":"$install_dir"
+    scp -C "$build_dir/smp-audio-requirements.txt" "$remote_user"@"$target_host":"$install_dir"
 
     # install requeirements into remote virtualenv
     run_remote "cd $app_dir/_versions/$version && virtualenv -p $python venv"
