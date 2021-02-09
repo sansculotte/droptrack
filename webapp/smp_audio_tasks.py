@@ -1,7 +1,8 @@
-import sys
-sys.path.append('/home/ub/code/smp_audio')
+import os, sys
 
-# from argparse import Namespace
+if 'SMP_AUDIO_PATH' in os.environ:
+    sys.path.append(os.environ['SMP_AUDIO_PATH'])
+
 from smp_audio.autoedit import autoedit_conf_default  # type: ignore
 from smp_audio.autoedit import main_autoedit  # type: ignore
 
