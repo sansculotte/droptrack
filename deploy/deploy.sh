@@ -66,6 +66,7 @@ deploy() {
     # install requeirements into remote virtualenv
     run_remote "cd $app_dir/_versions/$version && virtualenv -p $python venv"
     run_remote "cd $app_dir/_versions/$version && ./venv/bin/pip install -r requirements.txt"
+    run_remote "cd $app_dir/_versions/$version && ./venv/bin/pip install -r smp-audio-requirements.txt"
 
     # remove current "current" symlink
     run_remote "if [ -L $app_dir/current ]; then rm $app_dir/current; fi"
