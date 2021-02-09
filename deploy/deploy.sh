@@ -6,6 +6,7 @@ target_host=${1-"droptrack"}
 app_dir=${2-"/opt/droptrack"}
 remote_user=${3-"deploy"}
 filespace=${4-"$app_dir/data"}
+www_user="www-data"
 
 python="python3.8"
 build_dir="build"
@@ -54,7 +55,7 @@ prepare_remote() {
 
 deploy() {
 
-    install_dir="$app_dir/_versions/$version/"
+    install_dir="$app_dir/_versions/$version"
 
     # transfer files
     scp -r "$build_dir/webapp" "$remote_user"@"$target_host":"$install_dir"
@@ -65,24 +66,29 @@ deploy() {
     scp -C "$build_dir/smp-audio-requirements.txt" "$remote_user"@"$target_host":"$install_dir"
 
     # install requeirements into remote virtualenv
-    run_remote "cd $app_dir/_versions/$version && virtualenv -p $python venv"
-    run_remote "cd $app_dir/_versions/$version && ./venv/bin/pip install -r requirements.txt"
-    run_remote "cd $app_dir/_versions/$version && ./venv/bin/pip install -r smp-audio-requirements.txt"
+    run_remote "cd $install_dir && virtualenv -p $python venv"
+    run_remote "cd $install_dir && ./venv/bin/pip install -r requirements.txt"
+    run_remote "cd $install_dir && ./venv/bin/pip install -r smp-audio-requirements.txt"
 
     # remove current "current" symlink
     run_remote "if [ -L $app_dir/current ]; then rm $app_dir/current; fi"
 
     # link new
-    run_remote "ln -s $app_dir/_versions/$version $app_dir/current"
+    run_remote "ln -s $install_dir $app_dir/current"
 
     # cleanup, remove old installations, keep 5
     run_remote "cd $app_dir/_versions/ && ls -C1 -t| awk 'NR>5'|xargs rm -Rf"
 
     # run migrations
-    run_remote "cd $app_dir/_versions/$version && FLASK_APP='webapp:create_app()' ./venv/bin/flask db upgrade"
+    run_remote "cd $install_dir && FLASK_APP='webapp:create_app()' ./venv/bin/flask db upgrade"
+
+    # create cachedir needed for smp_audio and set write-permissions for server process
+    run_remote "mkdir -p $install_dir/cachedir/joblib"
+    run_remote "sudo chgrp -R $www_user $install_dir/cachedir"
+    run_remote "sudo chmod -R g+w $install_dir/cachedir"
 
     # restart app server
-    run_remote "service uwsgi restart"
+    run_remote "sudo service uwsgi restart"
 }
 
 prepare_local
