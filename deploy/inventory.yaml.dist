@@ -3,9 +3,11 @@ droptrack:
         <your ip>
     vars:
         server_name: <your hostname>
+        ansible_port: 22
         ansible_connection: ssh
         ansible_user: deploy
         ansible_python_interpreter: /usr/local/bin/python3
         postgres_password: <password>
         www_user: www-data
         uwsgi_workers: 2
+        smp_audio_path: /opt/droptrack/smp_audio
