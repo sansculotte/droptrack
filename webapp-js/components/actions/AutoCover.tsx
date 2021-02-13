@@ -23,7 +23,7 @@ interface Props {
 
 const AutoCover = (props: Props) => {
 
-  const outputFormatOptions: Array<[string, string]> = [['pdf', 'pdf'], ['jpg', 'jpg']] 
+  const outputFormatOptions = ['pdf', 'jpg']
 
   const [ files, setFiles ] = useState(props.parameters.files)
   const [ outputFormat, setOutputFormat ] = useState<Array<string>>(props.parameters.output_format)
@@ -102,7 +102,7 @@ const AutoCover = (props: Props) => {
       />
       <label>Output Formats</label>
       <MultiSelect
-        options={outputFormatOptions}
+        options={outputFormatOptions.map(i => [i, i])}
         selected={outputFormat}
         onChange={handleOutputFormatChange}
       />
