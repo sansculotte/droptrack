@@ -5,6 +5,7 @@ import http from 'lib/http'
 import { AutoActionTaskResult } from './AutoActionTaskResult'
 import { ErrorMessage } from '../ErrorMessage'
 import { MultiFileChooser } from '../MultiFileChooser'
+import { MultiSelect } from '../MultiSelect'
 import Process from '../Process'
 
 import { AutoCover } from 'interfaces/Action'
@@ -22,7 +23,10 @@ interface Props {
 
 const AutoCover = (props: Props) => {
 
+  const outputFormatOptions = ['pdf', 'jpg']
+
   const [ files, setFiles ] = useState(props.parameters.files)
+  const [ outputFormat, setOutputFormat ] = useState<Array<string>>(props.parameters.output_format)
   const [ errors, setErrors ] = useState<Array<string>>([])
   const [ task, setTask ] = useState<Task|undefined>()
   const [ taskId, setTaskId ] = useState<string|null>(null)
@@ -55,6 +59,17 @@ const AutoCover = (props: Props) => {
     setErrors([])
   }
 
+  const handleOutputFormatChange = (format: Array<string>) => {
+    setOutputFormat(format)
+    if (format.length > 0) {
+      setErrors([])
+    }
+    else {
+      errors.push('Please choose at least one output format')
+      setErrors(errors)
+    }
+  }
+
   const handleSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     if (task && task.status === 'done') {
       return
@@ -84,6 +99,12 @@ const AutoCover = (props: Props) => {
         setFiles={handleFilesChange}
         selected={files}
         allowedExtensions={['wav', 'mp3', 'ogg', 'flac']}
+      />
+      <label>Output Formats</label>
+      <MultiSelect
+        options={outputFormatOptions.map(i => [i, i])}
+        selected={outputFormat}
+        onChange={handleOutputFormatChange}
       />
       {!task
         ? <input type="submit" value="start" />
