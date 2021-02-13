@@ -11,6 +11,7 @@ interface Props {
   allowedExtensions?: Array<string>
   exclude: Array<File>
   onSelect: (file: File) => void
+  close: () => void
 }
 
 const FileChooser = (props: Props) => {
@@ -43,6 +44,7 @@ const FileChooser = (props: Props) => {
 
   return (
     <div className={styles.fileChooser}>
+      <a onClick={props.close}>🗙</a>
       <ul>
         {availableFiles.sort(sortCompare('name')).map((file, index) =>
           <li key={index} onClick={() => select(index)}>{file.name}</li>
