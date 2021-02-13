@@ -22,7 +22,8 @@ interface AutoEdit extends ActionBase {
 interface AutoCoverParameters {
   duration: number
   files: Array<File>
-  [key: string]: string | number | Array<File>
+  output_format: Array<string> 
+  [key: string]: string | string[] | number | Array<File>
 }
 
 interface AutoCover extends ActionBase {
