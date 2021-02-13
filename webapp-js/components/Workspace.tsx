@@ -106,7 +106,7 @@ class Workspace extends React.Component<Props, State> {
     if (results.length > 0) {
       results[0]
         .then((response: ApiResponse) => {
-          const { message } = response
+          const { message } = response.data
           this.props.flashMessage(message)
         })
         .catch((error: ApiResponse) => console.error(error))

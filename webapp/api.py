@@ -261,7 +261,9 @@ def list_actions():
         {
             'name': 'autocover',
             'url': '/actions/autocover',
-            'parameters': {}
+            'parameters': {
+                'output_format': ['jpg']
+            }
         }
     ])
 
