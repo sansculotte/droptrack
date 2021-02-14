@@ -230,7 +230,7 @@ def list_actions():
     return api_response_ok([
         {
             'name': 'autoedit',
-            'url': '/actions/autoedit',
+            'url': '/api/autoedit',
             'parameters': {
                 'files': [],
                 'assemble_mode': 'random',
@@ -260,14 +260,14 @@ def list_actions():
         },
         {
             'name': 'autocover',
-            'url': '/actions/autocover',
+            'url': '/api/autocover',
             'parameters': {
                 'output_format': ['jpg']
             }
         },
         {
             'name': 'automaster',
-            'url': '/actions/automaster',
+            'url': '/api/automaster',
             'parameters': {
                 'bitdepth': 16
             }
