@@ -48,6 +48,7 @@ const MultiFileChooser = (props: Props) => {
             exclude={selectedFiles}
             onSelect={addFile}
             allowedExtensions={props.allowedExtensions}
+            close={() => setShowFileChooser(false)}
           />
         : <button onClick={toogleFileChooser}>Add File</button>
       }
