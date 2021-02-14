@@ -264,6 +264,13 @@ def list_actions():
             'parameters': {
                 'output_format': ['jpg']
             }
+        },
+        {
+            'name': 'automaster',
+            'url': '/actions/automaster',
+            'parameters': {
+                'bitdepth': 16
+            }
         }
     ])
 
