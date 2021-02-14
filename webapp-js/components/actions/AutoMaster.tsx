@@ -98,7 +98,7 @@ const AutoMaster = (props: Props) => {
     if (files.length === 0) {
       errors.push('Please Add an Input File')
     }
-    if (parameters.bitdepth == 16 || parameters.bitdepth == 24) {
+    if (parameters.bitdepth === 16 || parameters.bitdepth === 24) {
     }
     else {
       errors.push('Missing bitdepth set to default 16')
