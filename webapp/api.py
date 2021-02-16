@@ -159,7 +159,7 @@ def delete_file(filename: str) -> Response:
         filename
     )
     os.unlink(location)
-    return api_response_ok({'message': 'file deleted'})
+    return api_response_ok({'message': f'file "{filename}" deleted'})
 
 
 @api.route('/tasks')

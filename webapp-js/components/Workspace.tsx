@@ -85,7 +85,11 @@ class Workspace extends React.Component<Props, State> {
           </form>
         )}
         {this.state.activeWidget === "files" && (
-          <FileList files={this.state.files} />
+          <FileList
+            files={this.state.files}
+            onChange={this.loadFileList.bind(this)}
+            flashMessage={this.props.flashMessage}
+          />
         )}
         {this.state.activeWidget === "actions" && (
           <ActionPanel
