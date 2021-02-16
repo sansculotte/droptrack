@@ -29,6 +29,11 @@ async function request(
   return response
 }
 
+async function _delete(path: string) {
+  const response = await request(apiUrl(path), 'DELETE')
+  return await response.json()
+}
+
 async function get(path: string, params?:Array<[string, string]>) {
   const url = apiUrl(path)
   if (params) {
@@ -89,6 +94,7 @@ async function getBlob(path: string, params?:Array<[string, string]>) {
 }
 
 export default {
+  delete: _delete,
   get,
   getBlob,
   put,
