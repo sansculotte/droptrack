@@ -44,7 +44,7 @@ const FileChooser = (props: Props) => {
 
   return (
     <div className={styles.fileChooser}>
-      <a onClick={props.close}>🗙</a>
+      <div><a onClick={props.close}>🗙</a></div>
       <ul>
         {availableFiles.sort(sortCompare('name')).map((file, index) =>
           <li key={index} onClick={() => select(index)}>{file.name}</li>
