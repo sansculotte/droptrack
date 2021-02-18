@@ -2,17 +2,24 @@
 
 div.fileChooser {
   width: 100%;
-  height: 300px;
-  overflow: auto;
-  position: relative;
-  z-index: 99;
   background-color: $middle;
-  & > ul > li {
-    padding: 4px 8px 4px 8px;
+  & > div {
+    width: 100%;
+    height: 30px;
+    border-bottom: 2px solid $light;
+    & > a {
+      display: block;
+      float: right;
+      cursor: pointer;
+      margin: 5px 5px 0 0;
+    }
   }
-  & > a {
-    display: block;
-    float: right;
-    cursor: pointer;
+  & > ul {
+    height: 300px;
+    overflow: auto;
+    z-index: 99;
+    & > li {
+      padding: 4px 8px 4px 8px;
+    }
   }
 }
