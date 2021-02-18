@@ -44,7 +44,7 @@ def authenticate() -> Optional[Response]:
 
 
 @api.errorhandler(404)
-def not_found(error: NotFound):
+def not_found(error: NotFound) -> Response:
     message = error.description
     return api_response_error({'message': message}, status=404)
 
@@ -124,12 +124,16 @@ def list_files() -> Response:
     """
     List files in workspace
     """
-    files = os.listdir(g.user.home_directory)
-    return api_response_ok({
-        'files': [
-            {'name': name} for name in files if not name.startswith('.')
-        ]
-    })
+    try:
+        files = os.listdir(g.user.home_directory)
+    except FileNotFoundError:
+        raise NotFound('User home directory does not exist')
+    else:
+        return api_response_ok({
+            'files': [
+                {'name': name} for name in files if not name.startswith('.')
+            ]
+        })
 
 
 @api.route('/files', methods=['POST'])
@@ -181,12 +185,16 @@ def delete_file(filename: str) -> Response:
         g.user.home_directory,
         filename
     )
-    os.unlink(location)
-    return api_response_ok({'message': f'file "{filename}" deleted'})
+    try:
+        os.unlink(location)
+    except FileNotFoundError:
+        raise NotFound('File not found')
+    else:
+        return api_response_ok({'message': f'file "{filename}" deleted'})
 
 
 @api.route('/tasks')
-def list_tasks():
+def list_tasks() -> Response:
     """
     Task List
     """
@@ -198,7 +206,7 @@ def list_tasks():
 
 
 @api.route('/tasks/<uuid:uuid>', methods=['PUT'])
-def update_task(uuid):
+def update_task(uuid) -> Response:
     """
     Update Task status and result_location
     """
@@ -222,7 +230,7 @@ def update_task(uuid):
 
 
 @api.route('/tasks/<uuid:uuid>', methods=['GET'])
-def show_task(uuid):
+def show_task(uuid) -> Response:
     """
     Task details and status 202 if still processing
     """
@@ -234,14 +242,14 @@ def show_task(uuid):
     if not task:
         raise NotFound('Task not found')
 
-    if task.is_done:
-        return api_response_ok(task.to_dict())
     if task.is_processing:
         return api_response_accepted(task.to_dict(), location=task.url)
+    else:
+        return api_response_ok(task.to_dict())
 
 
 @api.route('/actions')
-def list_actions():
+def list_actions() -> Response:
     """
     Action Catalog
     :param str:
