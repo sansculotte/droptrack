@@ -1,7 +1,8 @@
-from typing import Optional, Union
+from typing import Dict, Optional, Union
 import os
 from werkzeug.utils import secure_filename
 from multiprocessing import Process
+from werkzeug.exceptions import Forbidden, NotFound
 from flask import (
     g,
     current_app,
@@ -23,6 +24,7 @@ from .downloader import download
 The main mechanics of the webapp.
 """
 
+
 api = Blueprint('api', __name__)
 
 
@@ -36,20 +38,30 @@ def authenticate() -> Optional[Response]:
         g.user = User.find_by_api_key(token)
         if g.user:
             return None
-    return not_authorized()
+        raise Forbidden('Invalid APi key')
+    else:
+        raise Forbidden('Missing API key')
 
 
-def not_found(message='not found'):
+@api.errorhandler(404)
+def not_found(error: NotFound):
+    message = error.description
     return api_response_error({'message': message}, status=404)
 
 
-def not_authorized(message='not authorized') -> Response:
+@api.errorhandler(403)
+def not_authorized(error: Forbidden) -> Response:
+    message = error.description
     return api_response_error({'message': message}, status=403)
 
 
 def api_response_ok(data: Union[dict, list], status: int = 200) -> Response:
     rv = {'status': 'ok', 'data': data}
-    return Response(json.dumps(rv), status=status)
+    return Response(
+        json.dumps(rv),
+        content_type='application/json',
+        status=status
+    )
 
 
 def api_response_accepted(data: Union[dict, list], location: str) -> Response:
@@ -58,14 +70,25 @@ def api_response_accepted(data: Union[dict, list], location: str) -> Response:
     in the Location header
     """
     rv = {'status': 'accepted', 'data': data}
-    response = Response(json.dumps(rv), status=202)
+    response = Response(
+        json.dumps(rv),
+        content_type='application/json',
+        status=202
+    )
     response.headers['Location'] = location
     return response
 
 
-def api_response_error(data: dict, status: int = 400) -> Response:
+def api_response_error(
+    data: Dict[str, Union[str, dict, list]] = None,
+    status: int = 400
+) -> Response:
     rv = {'status': 'error', 'data': data}
-    return Response(json.dumps(rv), status=status)
+    return Response(
+        json.dumps(rv),
+        content_type='application/json',
+        status=status
+    )
 
 
 @api.route('/url', methods=['POST'])
@@ -93,7 +116,7 @@ def url() -> Response:
             location=task.url
         )
     else:
-        return api_response_error({'message': 'Invalid url'})
+        return api_response_error({'message': 'Invalid url'}, 400)
 
 
 @api.route('/files', methods=['GET'])
@@ -184,17 +207,18 @@ def update_task(uuid):
         Task.user_id == g.user.id
     ).first()
 
-    if task:
-        try:
-            task.status = Status[request.json['status']]
-            task.result_location = request.json['result_location']
-        except Exception as e:
-            return api_response_error({'message': str(e)})
-        else:
-            db.session.add(task)
-            db.session.commit()
-        return api_response_ok(task.to_dict())
-    return not_found()
+    if not task:
+        raise NotFound('Task not found')
+
+    try:
+        task.status = Status[request.json['status']]
+        task.result_location = request.json['result_location']
+    except Exception as e:
+        return api_response_error({'message': str(e)})
+    else:
+        db.session.add(task)
+        db.session.commit()
+    return api_response_ok(task.to_dict())
 
 
 @api.route('/tasks/<uuid:uuid>', methods=['GET'])
@@ -207,12 +231,13 @@ def show_task(uuid):
         Task.user_id == g.user.id
     ).first()
 
-    if task:
-        if task.is_done:
-            return api_response_ok(task.to_dict())
-        if task.is_processing:
-            return api_response_accepted(task.to_dict(), location=task.url)
-    return not_found()
+    if not task:
+        raise NotFound('Task not found')
+
+    if task.is_done:
+        return api_response_ok(task.to_dict())
+    if task.is_processing:
+        return api_response_accepted(task.to_dict(), location=task.url)
 
 
 @api.route('/actions')
