@@ -64,6 +64,16 @@ async function upload(path: string, file: any, fieldname: string='file') {
   return await response.json()
 }
 
+function uploadParams(path: string) {
+  const headers = {
+    'X-Authentication': window.localStorage.getItem('apiKey') || ''
+  }
+  return {
+    headers,
+    url: apiUrl(path).toString(),
+  }
+}
+
 async function poll(path: string) {
   const response = await request(apiUrl(path), 'GET')
   const data = await response.json()
@@ -101,4 +111,5 @@ export default {
   poll,
   post,
   upload,
+  uploadParams,
 }

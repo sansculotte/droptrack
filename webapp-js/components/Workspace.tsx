@@ -9,7 +9,6 @@ import TaskList from "./TaskList"
 import TaskPoll from "./TaskPoll"
 
 import Action from "interfaces/Action"
-import ApiResponse from "interfaces/ApiResponse"
 import File from "interfaces/File"
 import Task from "interfaces/Task"
 
@@ -76,7 +75,7 @@ class Workspace extends React.Component<Props, State> {
           <form>
             <FileDrop
               accept="audio/*"
-              onDrop={this.handleDropFile.bind(this)}
+              onUploadFinished={this.uploadFinished.bind(this)}
             />
             <FileUrl
               addTask={this.addTask.bind(this)}
@@ -105,18 +104,8 @@ class Workspace extends React.Component<Props, State> {
     )
   }
 
-  private handleDropFile(files: Array<any>) {
-    const results = files.map((f) => http.upload("/files", f, "soundfile"))
-    if (results.length > 0) {
-      results[0]
-        .then((response: ApiResponse) => {
-          const { message } = response.data
-          this.props.flashMessage(message)
-        })
-        .catch((error: ApiResponse) => console.error(error))
-    } else {
-      console.error("no files")
-    }
+  private uploadFinished(message: string) {
+    this.props.flashMessage(message)
   }
 
   private showActionList() {
