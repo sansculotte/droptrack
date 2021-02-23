@@ -61,7 +61,6 @@ main.app {
     grid-template: repeat(2, 1fr);
     &>div, select, input[type="text"], label {
       grid-column: 1 / span 2;
-      width: 100%;
     }
     label {
       color: $dark;
@@ -111,6 +110,11 @@ main.app {
   button {
     height: 40px;
   }
+}
+
+progress {
+  &::-webkit-progress-value {background-color: $highlight !important;}
+  &::-moz-progress-bar {background-color: $highlight !important;}
 }
 
 @media screen and (max-width: $mobile-breakpoint) {

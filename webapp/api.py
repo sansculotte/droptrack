@@ -141,9 +141,9 @@ def upload_file() -> Response:
     """
     Accept direct soundfile upload per multipart/form-data
     """
-    soundfile = request.files.get('soundfile')
-    if soundfile and validate_soundfile(soundfile):
-        filename = secure_filename(soundfile.filename)
+    file = request.files.get('file')
+    if file and validate_soundfile(file):
+        filename = secure_filename(file.filename)
 
         # make sure home directory exists.
         if not os.path.exists(g.user.home_directory):
@@ -156,7 +156,7 @@ def upload_file() -> Response:
             g.user.home_directory,
             filename
         )
-        soundfile.save(location)
+        file.save(location)
         url = url_for('api.download_file', filename=filename, _external=True)
         current_app.queue.send(url)
         return api_response_ok({'message': 'File accepted'})

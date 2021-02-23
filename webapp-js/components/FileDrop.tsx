@@ -1,30 +1,39 @@
 import * as React from 'react'
-import { useCallback } from 'react'
-import { useDropzone } from 'react-dropzone'
+
+import http from 'lib/http'
+import './FileDrop.css'
+import Dropzone from 'react-dropzone-uploader'
 
 import UploadSymbol from 'components/UploadSymbol'
 
 interface Props {
-  onDrop: (args: Array<any>) => void
   accept: string
+  onUploadFinished: (message: string) => void
 }
 
-export default (props: Props) => {
-  const onDrop = useCallback(props.onDrop, [])
-  const {
-    getRootProps,
-    getInputProps,
-    isDragActive
-  } = useDropzone({onDrop, accept: props.accept})
+type Status = 'done' | 'uploading' | 'error_upload' | 'headers_received' | 'aborted'
 
+export default (props: Props) => {
+
+  const handleChangeStatus = ({ meta }: any, status: Status) => {
+    if (status === 'done') {
+      props.onUploadFinished(`${meta.name} uploaded`)
+    }
+  }
+    
   return (
-    <div {...getRootProps()}>
-      <input {...getInputProps()} />
-      {
-        isDragActive
-          ? <UploadSymbol />
-          : <UploadSymbol />
-      }
-    </div>
+    <Dropzone
+      getUploadParams={() => http.uploadParams('/files')}
+      onChangeStatus={handleChangeStatus}
+      accept={props.accept}
+      inputContent={UploadSymbol}
+      submitButtonContent={null}
+      styles={{
+        dropzone: {
+          minHeight: 500,
+          overflow: 'auto'
+        }
+      }}
+    />
   )
 }
