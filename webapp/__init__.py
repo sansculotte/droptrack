@@ -1,7 +1,9 @@
 import atexit
 from logging import Formatter
 from logging.handlers import SysLogHandler
+import json
 import os
+from werkzeug.exceptions import HTTPException
 from flask import (
     Flask,
     render_template,
@@ -12,13 +14,28 @@ from .api import api
 from .models import db
 
 
-
 try:
     APP_ENV = os.environ['APP_ENV']
 except KeyError:
     APP_ENV = 'config.Config'
 
-    
+
+def handle_exception(e):
+    """Return JSON instead of HTML for HTTP errors."""
+    # start with the correct headers and status code from the error
+    response = e.get_response()
+    # replace the body with JSON
+    response.data = json.dumps({
+        'status': 'error',
+        'data': {
+            'name': e.name,
+            'message': e.description
+        }
+    })
+    response.content_type = "application/json"
+    return response
+
+
 def root():
     return render_template('main.html')
 
@@ -33,6 +50,7 @@ def setup_routes(app: Flask):
         app.logger.error('Could not import api_smp')
     else:
         app.register_blueprint(api_smp, url_prefix='/api')
+
 
 def setup_queue(app: Flask):
     app.queue = Queue(app.config)
@@ -51,6 +69,12 @@ def setup_logging(app: Flask):
     app.logger.addHandler(handler)
 
 
+def setup(app: Flask):
+    setup_routes(app)
+    setup_queue(app)
+    setup_logging(app)
+    app.register_error_handler(HTTPException, handle_exception)
+
 def create_app() -> Flask:
     """
     Using the app-factory pattern
@@ -63,9 +87,7 @@ def create_app() -> Flask:
     )
     app.config.from_object(APP_ENV)
     db.init_app(app)
-    setup_routes(app)
-    setup_queue(app)
-    setup_logging(app)
+    setup(app)
     Migrate(app, db)
 
     @app.shell_context_processor

@@ -54,25 +54,28 @@ const AutoEdit = (props: Props) => {
     setTaskId(null)
   }
 
-  const handleDurationChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(ev.currentTarget.value, 10)
-    if (!isNaN(value)) {
-      setDuration(`${value}`)
+  const numberInputChangeHandler = (
+    setInput: (value: string) => void
+  ) => (
+    ev: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { value } = ev.currentTarget
+    if (value) {
+      const intValue = parseInt(value, 10)
+      if (!isNaN(intValue)) {
+        setInput(`${intValue}`)
+        setErrors([])
+      }
     }
-    setErrors([])
+    else {
+      setInput('')
+      setErrors([])
+    }
   }
 
   const handleAssemblyModeChange = (ev: React.ChangeEvent<HTMLSelectElement>) => {
     const assemblyMode = ev.currentTarget.value as AutoEditParameters['assembly_mode']
     setAssemblyMode(assemblyMode)
-  }
-
-  const handleNumsegsChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(ev.currentTarget.value, 10)
-    if (!isNaN(value)) {
-      setNumsegs(`${value}`)
-    }
-    setErrors([])
   }
 
   const handleFilesChange = (files: Array<File>) => {
@@ -128,7 +131,7 @@ const AutoEdit = (props: Props) => {
         type="text"
         name="duration"
         value={duration}
-        onChange={handleDurationChange}
+        onChange={numberInputChangeHandler(setDuration)}
       />
       <label>Assembly Mode</label>
       <select
@@ -145,7 +148,7 @@ const AutoEdit = (props: Props) => {
         type="text"
         name="numsegs"
         value={numsegs}
-        onChange={handleNumsegsChange}
+        onChange={numberInputChangeHandler(setNumsegs)}
       />
       {!task
         ? <input type="submit" value="start" />
