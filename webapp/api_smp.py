@@ -255,6 +255,12 @@ def automaster_POST():
 
     # request data copy to configuration
     request_data = request.json
+
+    if 'files' in request_data and 'filenames' not in request_data:
+        # request_data['filenames'] = [f['name'] for f in request_data['files']]
+        request_data['filenames'] = [request_data['files'][0]['name']]
+        request_data['references'] = [request_data['files'][1]['name']]
+
     for k in automaster_conf_default:
         k_req = f'{k}'
         if k_req in request_data:
