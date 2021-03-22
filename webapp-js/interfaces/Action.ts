@@ -30,7 +30,17 @@ interface AutoCover extends ActionBase {
   parameters: AutoCoverParameters 
 }
 
-type Action = AutoEdit | AutoCover
+interface AutoMasterParameters {
+  files: Array<File>
+  bitdepth: number
+  [key: string]: number | Array<File>
+}
+
+interface AutoMaster extends ActionBase {
+  parameters: AutoMasterParameters
+}
+
+type Action = AutoEdit | AutoCover | AutoMaster
 
 export default Action
-export { AutoEdit, AutoCover, AutoEditParameters, AutoCoverParameters }
+export { AutoEdit, AutoCover, AutoMaster, AutoEditParameters, AutoCoverParameters, AutoMasterParameters }
