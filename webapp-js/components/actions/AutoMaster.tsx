@@ -25,9 +25,6 @@ const AutoMaster = (props: Props) => {
 
   const [ files, setFiles ] = useState(props.parameters.files)
   const [ bitdepth, setBitdepth ] = useState(`${props.parameters.bitdepth}`)
-  // const [ duration, setDuration ] = useState(`${props.parameters.duration}`)
-  // const [ numsegs, setNumsegs ] = useState(`${props.parameters.numsegs}`)
-  // const [ assemblyMode, setAssemblyMode ] = useState(props.parameters.assembly_mode)
   const [ errors, setErrors ] = useState<Array<string>>([])
   const [ taskId, setTaskId ] = useState<string|null>(null)
   const [ task, setTask ] = useState<Task|undefined>()
@@ -55,21 +52,8 @@ const AutoMaster = (props: Props) => {
     setTaskId(null)
   }
 
-  // const handleDurationChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
-  //   const value = parseInt(ev.currentTarget.value, 10)
-  //   if (!isNaN(value)) {
-  //     setDuration(`${value}`)
-  //   }
-  //   setErrors([])
-  // }
-
-  // const handleAssemblyModeChange = (ev: React.ChangeEvent<HTMLSelectElement>) => {
-  //   const assemblyMode = ev.currentTarget.value as AutoMasterParameters['assembly_mode']
-  //   setAssemblyMode(assemblyMode)
-  // }
-
   const handleBitdepthChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(ev.currentTarget.value, 10)
+  const value = parseInt(ev.currentTarget.value, 10)
     if (!isNaN(value)) {
       setBitdepth(`${value}`)
     }
@@ -91,22 +75,18 @@ const AutoMaster = (props: Props) => {
     const errors = []
     const parameters = {
       files,
-      // duration: parseInt(duration, 10),
       bitdepth: parseInt(bitdepth, 10),
-      // assembly_mode: assemblyMode
     }
     if (files.length === 0) {
       errors.push('Please Add an Input File')
     }
     if (parameters.bitdepth === 16 || parameters.bitdepth === 24) {
+      // everything ok i guess
     }
     else {
       errors.push('Missing bitdepth set to default 16')
       parameters.bitdepth = 16
     }
-    // if (parameters.duration < 0) {
-    //   errors.push('Duration must be positive')
-    // }
     if (errors.length > 0) {
       setErrors(errors)
     }
