@@ -94,7 +94,7 @@
 }
 
 .dzu-previewImage {
-  width: auto;
+  width: unset;
   max-height: 40px;
   max-width: 140px;
 }

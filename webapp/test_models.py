@@ -32,3 +32,8 @@ class TaskModelTest(BaseTestCase):
         assert task in user.tasks
         assert str(task.uuid) in task.url
         assert task.status == Status.processing
+
+    def test_task_name_error_when_longer_than_64_chars(self):
+        Task(name="x" * 64)
+        with self.assertRaises(AssertionError):
+            Task(name="x" * 128)

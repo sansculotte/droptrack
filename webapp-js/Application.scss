@@ -77,7 +77,7 @@ main.app {
     input, select {
       height: 40px;
       box-sizing: border-box;
-      border: 2px solid silver;
+      border: 2px solid $middle;
     }
   }
   a.button {

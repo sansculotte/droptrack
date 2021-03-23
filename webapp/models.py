@@ -5,6 +5,7 @@ from uuid import uuid4
 from enum import Enum
 from flask import current_app, url_for
 from flask_sqlalchemy import SQLAlchemy  # type: ignore
+from sqlalchemy.orm import validates
 from webapp.lib.security import generate_password
 from .type_decorators import Password, UUID
 
@@ -94,6 +95,11 @@ class Task(db.Model):
     @staticmethod
     def find_by_uuid(uuid: str) -> Optional['Task']:
         return Task.query.filter_by(uuid=uuid).first()
+
+    @validates('name')
+    def validate_name(self, key, value):
+        assert len(value) < 65
+        return value
 
     @property
     def url(self) -> str:

@@ -93,10 +93,10 @@ def autoedit_POST():
 
     current_app.logger.info(f'api_smp.autoedit_POST autoedit_conf_request {autoedit_conf}')
 
-    task = Task(
-        name=os.path.basename(autoedit_conf.filename_export),
-        user=g.user,
-    )
+    filename_export = os.path.basename(autoedit_conf.filename_export)
+    task_name = f'autoedit {filename_export[:54]}'
+
+    task = Task(name=task_name, user=g.user)
     db.session.add(task)
     db.session.commit()
 
@@ -180,10 +180,10 @@ def autocover_POST():
 
     current_app.logger.info(f'api_smp.autocover_POST autocover_conf_request {autocover_conf}')
 
-    task = Task(
-        name=os.path.basename(autocover_conf.filename_export),
-        user=g.user,
-    )
+    filename_export = os.path.basename(autocover_conf.filename_export)
+    task_name = f'autoedit {filename_export[:54]}'
+
+    task = Task(name=task_name, user=g.user)
     db.session.add(task)
     db.session.commit()
 
@@ -283,10 +283,10 @@ def automaster_POST():
 
     automaster_conf.filename_export = autofilename(automaster_conf)
 
-    task = Task(
-        name=os.path.basename(automaster_conf.filename_export),
-        user=g.user,
-    )
+    filename_export = os.path.basename(automaster_conf.filename_export)
+    task_name = f'autoedit {filename_export[:54]}'
+
+    task = Task(name=task_name, user=g.user)
     db.session.add(task)
     db.session.commit()
 
