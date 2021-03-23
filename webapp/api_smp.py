@@ -79,7 +79,8 @@ def autoedit_POST():
     # request data copy to configuration
     request_data = request.json
     # extract filenames from files
-    request_data['filenames'] = [f['name'] for f in request_data['files']]
+    if 'files' in request_data and 'filenames' not in request_data:
+        request_data['filenames'] = [f['name'] for f in request_data['files']]
     for k in autoedit_conf_default:
         k_req = f'{k}'
         if k_req in request_data:
@@ -166,7 +167,10 @@ def autocover_POST():
     # request data copy to configuration
     request_data = request.json
     # overwrite from webapp
-    request_data['filenames'] = [f['name'] for f in request_data['files']]
+    if 'files' in request_data and 'filenames' not in request_data:
+        request_data['filenames'] = [f['name'] for f in request_data['files']]
+    if 'outputFormat' in request_data:
+        request_data['outputs'] = request_data['outputFormat']
     for k in autocover_conf_default:
         k_req = f'{k}'
         if k_req in request_data:
@@ -257,7 +261,6 @@ def automaster_POST():
     request_data = request.json
 
     if 'files' in request_data and 'filenames' not in request_data:
-        # request_data['filenames'] = [f['name'] for f in request_data['files']]
         request_data['filenames'] = [request_data['files'][0]['name']]
         request_data['references'] = [request_data['files'][1]['name']]
 
