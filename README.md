@@ -75,5 +75,5 @@ should be doing the right things, assuming the following requirements are met:
 - install and configure postgres database
 - install uwsgi
 
-There is an [ansible playbook](https://stackoverflow.com/questions/12269537/is-the-server-bundled-with-flask-safe-to-use-in-production) guiding you
-through setting setting up a production environment. 
+There is an [ansible playbook](https://docs.ansible.com/ansible/latest/user_guide/playbooks.html) guiding you
+through setting up the production environment. 
